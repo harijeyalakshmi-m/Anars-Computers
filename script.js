@@ -1,9 +1,9 @@
 /* =====================================================
-   ANARS COMPUTERS - FIRESTORE CLOUD SYNC & AUTH
+   ANARS COMPUTERS - SINGLE PAGE MERGED APP SCRIPT
 ===================================================== */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 import { firebaseConfig } from "./config.js";
 
@@ -28,6 +28,7 @@ let currentSearch = "";
 let wishlist = [];
 let cart = [];
 let orders = []; 
+let allUsersOrders = []; // For Admin View
 let productReviews = JSON.parse(localStorage.getItem("anarsProductReviews") || "{}");
 let currentSlide = 0;
 
@@ -61,6 +62,10 @@ onAuthStateChanged(auth, async (user) => {
             cart = []; wishlist = []; orders = [];
         }
 
+        if (isAdmin) {
+            await loadAllUsersOrdersForAdmin();
+        }
+
         if (authBtnContainer) {
             authBtnContainer.innerHTML = `
                 <button class="profile-icon-btn" id="profileToggleBtn" aria-label="My Profile">
@@ -68,7 +73,7 @@ onAuthStateChanged(auth, async (user) => {
                 </button>
                 <div id="profileDropdownMenu" class="profile-dropdown-menu">
                     <button onclick="openAccountModal()">My Profile</button>
-                    ${isAdmin ? `<a href="admin.html" style="display:block; padding:13px 18px; color:#16a34a; font-weight:800; text-decoration:none; font-size:13px;">⚙️ Admin Dashboard</a>` : ''}
+                    ${isAdmin ? `<button onclick="showPage('admin')" style="color:#16a34a; font-weight:800;">⚙️ Admin Dashboard</button>` : ''}
                     <button onclick="handleLogout()" style="color:#dc2626;">Logout</button>
                 </div>
             `;
@@ -204,6 +209,7 @@ async function loadProductsFromFirebase() {
         products = [];
         querySnapshot.forEach((docSnap) => { products.push({ id: docSnap.id, ...docSnap.data() }); });
         renderProducts();
+        renderAdminProductsList();
     } catch (e) { console.error("Error loading products: ", e); }
 }
 
@@ -225,6 +231,15 @@ function renderCategoriesGrid() {
 }
 
 function showPage(pageId) {
+    if (pageId === 'admin') {
+        if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
+            alert("🔒 Unauthorized access! Admin only.");
+            return;
+        }
+        renderAdminProductsList();
+        renderAdminOrdersList();
+    }
+
     if ((pageId === 'cart' || pageId === 'wishlist' || pageId === 'orders') && !currentUser) {
         alert("🔒 Please login to access your cart, wishlist & orders!"); return openAuthModal();
     }
@@ -236,6 +251,7 @@ function showPage(pageId) {
     else if (pageId === 'checkout') { renderCheckoutSummary(); document.getElementById("checkoutPage").classList.add("active"); }
     else if (pageId === 'success') { document.getElementById("successPage").classList.add("active"); }
     else if (pageId === 'orders') { renderMyOrdersPage(); document.getElementById("ordersPage").classList.add("active"); }
+    else if (pageId === 'admin') document.getElementById("adminPage").classList.add("active");
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -270,7 +286,6 @@ function renderProducts() {
 function filterCategory(category) { currentCategory = category; currentBrand = "All"; currentSearch = ""; document.getElementById("searchInput").value = ""; showPage('home'); renderProducts(); scrollToProducts(); }
 function filterBrand(brand) { currentBrand = brand; renderProducts(); }
 function searchProducts() { currentSearch = document.getElementById("searchInput").value.trim(); currentCategory = "All"; currentBrand = "All"; renderProducts(); }
-window.searchProductsMobile = function() { currentSearch = document.getElementById("mobileSearchInputSidebar").value.trim(); currentCategory = "All"; currentBrand = "All"; showPage('home'); renderProducts(); toggleMobileMenu(); scrollToProducts(); }
 function showAllProducts() { currentCategory = "All"; currentBrand = "All"; currentSearch = ""; document.getElementById("searchInput").value = ""; renderProducts(); }
 
 function openProductDetail(id) {
@@ -279,48 +294,29 @@ function openProductDetail(id) {
     const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
     const reviews = productReviews[id] || [];
 
-    let reviewsHtml = reviews.length === 0 ? `<p style="color:#64748b; font-size:13px; margin-top:10px;">No reviews yet. Be the first to review this product!</p>` : 
-        reviews.map(r => `<div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:8px; margin-top:10px;"><div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:#0f172a;"><span>${r.name}</span><span style="color:#d97706;">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span></div><p style="font-size:13px; color:#475569; margin-top:4px;">${r.comment}</p></div>`).join("");
+    let reviewsHtml = reviews.length === 0 ? `<p style="color:#64748b; font-size:13px; margin-top:10px;">No reviews yet.</p>` : 
+        reviews.map(r => `<div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:8px; margin-top:10px;"><div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700;"><span>${r.name}</span><span style="color:#d97706;">${'★'.repeat(r.rating)}</span></div><p style="font-size:13px; color:#475569; margin-top:4px;">${r.comment}</p></div>`).join("");
 
     document.getElementById("productDetailContainer").innerHTML = `
         <div class="full-detail-card">
             <div class="full-detail-img-box"><img src="${product.image}" alt="${product.name}" onerror="imageFallback(this)" loading="lazy" width="400" height="400"></div>
             <div class="full-detail-content">
                 <span class="product-brand">${product.brand}</span><h2>${product.name}</h2>
-                <div><span class="fk-rating-badge">5.0 Star Store</span><span style="font-size:13px; color:#64748b; margin-left:8px;">Annai Complex, Kuthukalvalasai</span></div>
                 <div class="fk-price-row"><span class="fk-current-price">₹${Number(product.price).toLocaleString("en-IN")}</span><span class="fk-original-price">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span><span class="fk-offer-tag">${discount}% Off</span></div>
-                <div class="fk-highlights-box"><h4>Product Overview & Specifications</h4><p>${product.description}</p></div>
-                <div class="fk-action-buttons"><button class="fk-add-cart-btn" onclick="addToCart('${product.id}')">ADD TO CART</button><button class="fk-buy-btn" onclick="addToCart('${product.id}'); showPage('cart')">PROCEED TO CART</button></div>
+                <div class="fk-highlights-box"><h4>Specifications</h4><p>${product.description}</p></div>
+                <div class="fk-action-buttons"><button class="fk-add-cart-btn" onclick="addToCart('${product.id}')">ADD TO CART</button></div>
             </div>
         </div>
         <div class="admin-card" style="margin-top: 30px; background:white; padding:30px; border-radius:16px; border:1px solid #e2e8f0;">
-            <h3 style="font-size:18px; font-weight:800; color:#0f172a; margin-bottom:15px;">Customer Reviews & Ratings</h3>
+            <h3>Customer Reviews</h3>
             <div style="max-height: 250px; overflow-y:auto; margin-bottom:20px;">${reviewsHtml}</div>
-            <h4 style="font-size:14px; font-weight:700; color:#334155; margin-bottom:10px;">Write a Review</h4>
-            <form onsubmit="submitProductReview(event, '${product.id}')" style="display:flex; flex-direction:column; gap:12px;">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"><input type="text" id="revName" placeholder="Your Name" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px;"><select id="revRating" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; font-weight:600;"><option value="5">5 Stars - Excellent</option><option value="4">4 Stars - Very Good</option><option value="3">3 Stars - Good</option></select></div>
-                <textarea id="revComment" placeholder="Write your feedback..." rows="3" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none; font-family:inherit;"></textarea>
-                <button type="submit" class="primary-btn" style="width:max-content; padding:10px 20px;">Post Review</button>
-            </form>
         </div>
     `;
     showPage('detail');
 }
 
-window.submitProductReview = function(event, productId) {
-    event.preventDefault();
-    if (!currentUser) { alert("🔒 Please login to post a review!"); return openAuthModal(); }
-    const name = document.getElementById("revName").value.trim();
-    const rating = Number(document.getElementById("revRating").value);
-    const comment = document.getElementById("revComment").value.trim();
-    if (!productReviews[productId]) productReviews[productId] = [];
-    productReviews[productId].unshift({ name, rating, comment });
-    localStorage.setItem("anarsProductReviews", JSON.stringify(productReviews));
-    alert("Review submitted successfully!"); openProductDetail(productId);
-};
-
 function toggleWishlist(id) {
-    if (!currentUser) { alert("🔒 Please login to save items to your wishlist!"); return openAuthModal(); }
+    if (!currentUser) return openAuthModal();
     if (wishlist.includes(id)) wishlist = wishlist.filter(item => item !== id); else wishlist.push(id);
     saveUserDataToCloud(); updateCounters(); renderProducts();
     if (document.getElementById("wishlistPage").classList.contains("active")) renderWishlistPage();
@@ -328,175 +324,182 @@ function toggleWishlist(id) {
 
 function renderWishlistPage() {
     const content = document.getElementById("wishlistPageContent");
-    if (!currentUser) { content.innerHTML = `<div class="fk-empty-cart"><h3>Please login to view your wishlist!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="openAuthModal()">Login</button></div>`; return; }
+    if (!currentUser) return;
     const items = wishlist.map(id => products.find(product => product.id == id)).filter(Boolean);
-    if (items.length === 0) { content.innerHTML = `<div class="fk-empty-cart"><h3>Your wishlist is empty!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="showPage('home')">Browse Store</button></div>`; return; }
-    
-    content.innerHTML = items.map(product => {
-        const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
-        return `
+    if (items.length === 0) { content.innerHTML = `<div class="fk-empty-cart"><h3>Your wishlist is empty!</h3></div>`; return; }
+    content.innerHTML = items.map(product => `
         <div class="fk-cart-item-card">
-            <div class="fk-cart-img-wrapper" style="border:none; padding:0; margin:0;"><img src="${product.image}" alt="${product.name}" class="fk-cart-item-img" onerror="imageFallback(this)" loading="lazy" width="120" height="120"></div>
+            <img src="${product.image}" alt="${product.name}" width="100" height="100" style="object-fit:cover; border-radius:8px;">
             <div class="fk-cart-item-details">
-                <h4 onclick="openProductDetail('${product.id}')">${product.name}</h4><div class="seller">Seller: Anars Computers • ${product.brand}</div>
-                <div class="fk-cart-price-row">
-                    <span class="fk-cart-price">₹${Number(product.price).toLocaleString("en-IN")}</span>
-                    <span class="fk-cart-mrp">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span>
-                    <span class="fk-cart-discount">${discount}% Off</span>
-                </div>
-                <div class="fk-action-links">
-                    <button onclick="removeWishlist('${product.id}')" class="fk-text-btn text-danger" style="color:#dc2626;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> REMOVE</button>
-                    <button onclick="addToCart('${product.id}'); removeWishlist('${product.id}');" class="fk-text-btn" style="color:#2563eb;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg> MOVE TO CART</button>
-                </div>
+                <h4>${product.name}</h4>
+                <p>₹${Number(product.price).toLocaleString("en-IN")}</p>
+                <button onclick="removeWishlist('${product.id}')" style="color:red; background:none; border:none; cursor:pointer;">Remove</button>
             </div>
-        </div>`
-    }).join("");
+        </div>`).join("");
 }
 
-function removeWishlist(id) { if (!currentUser) return; wishlist = wishlist.filter(item => item !== id); saveUserDataToCloud(); updateCounters(); renderWishlistPage(); renderProducts(); }
+function removeWishlist(id) { wishlist = wishlist.filter(item => item !== id); saveUserDataToCloud(); updateCounters(); renderWishlistPage(); renderProducts(); }
 
 function addToCart(id) {
-    if (!currentUser) { alert("🔒 Please login to add items to your cart!"); return openAuthModal(); }
+    if (!currentUser) return openAuthModal();
     const existing = cart.find(item => item.id == id);
     if (existing) existing.qty += 1; else cart.push({ id: id, qty: 1 });
     saveUserDataToCloud(); updateCounters();
-    const button = document.activeElement;
-    if (button && button.tagName === "BUTTON" && button.textContent.includes("CART")) { const oldText = button.innerHTML; button.innerHTML = "✓ ADDED"; setTimeout(() => { button.innerHTML = oldText; }, 1000); }
+    alert("Added to Cart!");
 }
 
 function updateCartQty(id, change) {
-    if (!currentUser) return;
     const item = cart.find(i => i.id == id);
     if (item) { item.qty += change; if (item.qty <= 0) cart = cart.filter(i => i.id != id); }
     saveUserDataToCloud(); updateCounters(); renderCartPage();
 }
 
-function removeCartItem(id) { if (!currentUser) return; cart = cart.filter(i => i.id != id); saveUserDataToCloud(); updateCounters(); renderCartPage(); }
+function removeCartItem(id) { cart = cart.filter(i => i.id != id); saveUserDataToCloud(); updateCounters(); renderCartPage(); }
 
 function renderCartPage() {
     const content = document.getElementById("cartPageContent");
-    if (!currentUser) { content.innerHTML = `<div class="fk-empty-cart"><h3>Please login to view your cart!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="openAuthModal()">Login</button></div>`; return; }
-    if (cart.length === 0) { content.innerHTML = `<div class="fk-empty-cart"><h3>Your cart is empty!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="showPage('home')">Start Shopping</button></div>`; return; }
+    if (!currentUser) return;
+    if (cart.length === 0) { content.innerHTML = `<div class="fk-empty-cart"><h3>Cart is empty!</h3></div>`; return; }
 
     let totalMRP = 0; let totalDiscountPrice = 0;
     let itemsHTML = cart.map(cartItem => {
         const product = products.find(p => p.id == cartItem.id);
         if (!product) return "";
         totalMRP += product.originalPrice * cartItem.qty; totalDiscountPrice += product.price * cartItem.qty;
-        const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
-
         return `
-            <div class="fk-cart-item-card">
-                <div class="fk-cart-img-wrapper">
-                    <img src="${product.image}" alt="${product.name}" class="fk-cart-item-img" onerror="imageFallback(this)" loading="lazy" width="120" height="120">
-                    <div class="fk-qty-controls"><button onclick="updateCartQty('${product.id}', -1)" aria-label="Decrease Quantity">-</button><span>${cartItem.qty}</span><button onclick="updateCartQty('${product.id}', 1)" aria-label="Increase Quantity">+</button></div>
+            <div class="fk-cart-item-card" style="display:flex; gap:15px; align-items:center; background:white; padding:15px; border-radius:12px; margin-bottom:12px; border:1px solid #e2e8f0;">
+                <img src="${product.image}" width="80" height="80" style="object-fit:cover; border-radius:8px;">
+                <div style="flex:1;">
+                    <h4>${product.name}</h4>
+                    <p>₹${Number(product.price).toLocaleString("en-IN")} x ${cartItem.qty}</p>
+                    <div style="display:flex; gap:10px; margin-top:8px;">
+                        <button onclick="updateCartQty('${product.id}', -1)" style="padding:2px 8px;">-</button>
+                        <span>${cartItem.qty}</span>
+                        <button onclick="updateCartQty('${product.id}', 1)" style="padding:2px 8px;">+</button>
+                        <button onclick="removeCartItem('${product.id}')" style="color:red; border:none; background:none; cursor:pointer; margin-left:15px;">Remove</button>
+                    </div>
                 </div>
-                <div class="fk-cart-item-details">
-                    <h4 onclick="openProductDetail('${product.id}')">${product.name}</h4><div class="seller">Seller: Anars Computers</div>
-                    <div class="fk-cart-price-row"><span class="fk-cart-price">₹${Number(product.price).toLocaleString("en-IN")}</span><span class="fk-cart-mrp">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span><span class="fk-cart-discount">${discount}% Off</span></div>
-                    <div class="fk-action-links"><button onclick="removeCartItem('${product.id}')" class="fk-text-btn" style="color:#dc2626;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> REMOVE</button></div>
-                </div>
-            </div>
-        `;
+            </div>`;
     }).join("");
 
-    const savings = totalMRP - totalDiscountPrice;
-    content.innerHTML = `
-        <div class="fk-cart-layout">
-            <div class="fk-cart-items-list">${itemsHTML}</div>
-            <div class="fk-price-sidebar">
-                <h3>Order Summary</h3>
-                <div class="fk-price-row-item"><span>Price (${cart.length} items)</span><span>₹${totalMRP.toLocaleString("en-IN")}</span></div>
-                <div class="fk-price-row-item"><span>Store Discount</span><span style="color:#16a34a;">- ₹${savings.toLocaleString("en-IN")}</span></div>
-                <div class="fk-price-row-item"><span>Delivery Charges</span><span style="color:#16a34a;">Free Delivery</span></div>
-                <div class="fk-price-row-item total"><span>Total Amount</span><span>₹${totalDiscountPrice.toLocaleString("en-IN")}</span></div>
-                <div class="fk-savings-banner">You will save ₹${savings.toLocaleString("en-IN")} on this order</div>
-                <button class="fk-place-order-btn" onclick="proceedToCheckout()">PLACE ORDER</button>
-            </div>
-        </div>
-    `;
-}
-
-function proceedToCheckout() {
-    if (!currentUser) return openAuthModal();
-    if (cart.length === 0) return alert("Your cart is empty!");
-    renderCheckoutSummary(); showPage('checkout');
+    content.innerHTML = `<div class="fk-cart-layout">${itemsHTML}</div><button class="primary-btn" onclick="showPage('checkout')" style="margin-top:20px; padding:12px 24px;">Proceed to Checkout</button>`;
 }
 
 function renderCheckoutSummary() {
-    let totalMRP = 0; let totalDiscountPrice = 0;
-    cart.forEach(cartItem => { const product = products.find(p => p.id == cartItem.id); if (product) { totalMRP += product.originalPrice * cartItem.qty; totalDiscountPrice += product.price * cartItem.qty; } });
-    document.getElementById("checkoutSummarySidebar").innerHTML = `<h3>Order Summary</h3><div class="fk-price-row-item"><span>Total MRP</span><span>₹${totalMRP.toLocaleString("en-IN")}</span></div><div class="fk-price-row-item total"><span>Payable Amount</span><span>₹${totalDiscountPrice.toLocaleString("en-IN")}</span></div>`;
+    let total = 0;
+    cart.forEach(ci => { const p = products.find(x => x.id == ci.id); if(p) total += p.price * ci.qty; });
+    document.getElementById("checkoutSummarySidebar").innerHTML = `<h4>Payable Amount: <strong>₹${total.toLocaleString("en-IN")}</strong></h4>`;
 }
 
-function submitOrder(event) {
+async function submitOrder(event) {
     event.preventDefault();
-    if (!currentUser) return openAuthModal();
-
+    if (!currentUser) return;
     const name = document.getElementById("shipName").value.trim();
     const phone = document.getElementById("shipPhone").value.trim();
     const address = document.getElementById("shipAddress").value.trim();
     const orderId = "ANARS-" + Math.floor(1000 + Math.random() * 9000);
 
-    const newOrder = { orderId, date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }), name, phone, address, items: [...cart], statusIndex: 1 };
+    const newOrder = { orderId, date: new Date().toLocaleDateString('en-IN'), name, phone, address, items: [...cart], statusIndex: 1, userId: currentUser.uid };
     
     orders.unshift(newOrder); 
     cart = []; 
-    saveUserDataToCloud(); 
+    await saveUserDataToCloud(); 
     updateCounters();
     document.getElementById("confirmedOrderId").textContent = orderId; 
     showPage('success');
 }
 
-function cancelOrder(orderId) {
-    if (!currentUser) return;
-    if (confirm("Are you sure you want to cancel this order?")) {
-        const orderIndex = orders.findIndex(o => o.orderId === orderId);
-        if (orderIndex > -1) { 
-            orders[orderIndex].statusIndex = 0; 
-            saveUserDataToCloud(); 
-            renderMyOrdersPage(); 
-            updateCounters(); 
-        }
-    }
-}
-
-window.downloadOrderInvoice = function(orderId) {
-    const order = orders.find(o => o.orderId === orderId);
-    if (!order) return;
-    let subtotal = 0;
-    let itemsRows = order.items.map(ci => {
-        const p = products.find(prod => prod.id == ci.id);
-        const name = p ? p.name : "Computer Hardware";
-        const price = p ? p.price : 0;
-        const total = price * ci.qty; subtotal += total;
-        return `<tr><td style="padding:10px; border-bottom:1px solid #e2e8f0;">${name}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:center;">${ci.qty}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:right;">₹${price.toLocaleString("en-IN")}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:right;">₹${total.toLocaleString("en-IN")}</td></tr>`;
-    }).join("");
-
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`<html><head><title>Invoice - #${order.orderId}</title><style>body{font-family:'Plus Jakarta Sans',sans-serif;padding:40px;color:#0f172a;}.invoice-box{max-width:800px;margin:auto;border:1px solid #cbd5e1;padding:40px;border-radius:8px;}.header{display:flex;justify-content:space-between;border-bottom:2px solid #0f172a;padding-bottom:20px;margin-bottom:20px;}.store-name{font-size:24px;font-weight:900;color:#1e3a8a;}table{width:100%;border-collapse:collapse;margin-top:20px;}th{background:#f8fafc;padding:12px;text-align:left;font-size:12px;border-bottom:2px solid #cbd5e1;}.total-row{font-size:16px;font-weight:800;text-align:right;margin-top:20px;}</style></head><body><div class="invoice-box"><div class="header"><div><div class="store-name">ANARS COMPUTERS</div><p style="font-size:12px;color:#64748b;">Annai Complex, Kuthukalvalasai, TN 627803</p></div><div style="text-align:right;"><h2>TAX INVOICE</h2><p style="font-size:12px;color:#64748b;">Order ID: #${order.orderId}<br>Date: ${order.date}</p></div></div><div style="margin-bottom:20px;font-size:13px;"><strong>Billed To:</strong><br>${order.name} (${order.phone})<br>${order.address}, Kuthukalvalasai, TN</div><table><thead><tr><th>Item</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Price</th><th style="text-align:right;">Total</th></tr></thead><tbody>${itemsRows}</tbody></table><div class="total-row">Grand Total: ₹${subtotal.toLocaleString("en-IN")}</div></div><script>window.print();</script></body></html>`);
-    printWindow.document.close();
-};
-
 function renderMyOrdersPage() {
     const container = document.getElementById("myOrdersListContainer");
-    if (!currentUser) { container.innerHTML = `<div class="fk-empty-cart"><h3>Please login to view your orders!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="openAuthModal()">Login</button></div>`; return; }
-    if (orders.length === 0) { container.innerHTML = `<div class="fk-empty-cart"><h3>No Orders Placed Yet!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="showPage('home')">Start Shopping</button></div>`; return; }
+    if (!currentUser || orders.length === 0) { container.innerHTML = `<p>No orders found.</p>`; return; }
+    container.innerHTML = orders.map(o => `
+        <div style="background:white; padding:20px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
+            <h4>Order ID: #${o.orderId}</h4>
+            <p>Date: ${o.date} | Status: ${o.statusIndex === 1 ? 'Order Placed' : 'Processed'}</p>
+            <p>Address: ${o.address}</p>
+        </div>`).join("");
+}
 
-    container.innerHTML = orders.map(order => {
-        let itemsHtml = order.items.map(cartItem => {
-            const product = products.find(p => p.id == cartItem.id);
-            if (!product) return "";
-            return `<div class="order-item-row"><img src="${product.image}" class="order-item-img" onerror="imageFallback(this)" loading="lazy" width="70" height="70"><div style="flex:1;"><h4 style="font-size:15px; font-weight:700;">${product.name}</h4><p style="font-size:13px; color:#64748b;">Qty: ${cartItem.qty} | Price: ₹${Number(product.price).toLocaleString("en-IN")}</p></div></div>`;
-        }).join("");
+// ================= ADMIN FUNCTIONS =================
+window.switchAdminTab = function(tab) {
+    if(tab === 'products') {
+        document.getElementById("adminProductsSection").style.display = "block";
+        document.getElementById("adminOrdersSection").style.display = "none";
+        document.getElementById("adminTabProdBtn").className = "primary-btn";
+        document.getElementById("adminTabOrdersBtn").className = "secondary-btn";
+    } else {
+        document.getElementById("adminProductsSection").style.display = "none";
+        document.getElementById("adminOrdersSection").style.display = "block";
+        document.getElementById("adminTabProdBtn").className = "secondary-btn";
+        document.getElementById("adminTabOrdersBtn").className = "primary-btn";
+    }
+};
 
-        const s = order.statusIndex;
-        let statusText = s === 0 ? "Cancelled" : s === 1 ? "Order Placed" : s === 2 ? "Packed at Store" : s === 3 ? "Out for Delivery" : "Delivered";
-        let statusColor = s === 0 ? "#ef4444" : s === 4 ? "#16a34a" : "#2563eb"; let statusBg = s === 0 ? "#fee2e2" : s === 4 ? "#dcfce7" : "#dbeafe";
-        let cancelBtnHtml = s === 1 ? `<button class="cancel-order-btn" onclick="cancelOrder('${order.orderId}')">Cancel Order</button>` : '';
+window.handleAddNewProduct = async function(event) {
+    event.preventDefault();
+    const name = document.getElementById("adminProdName").value.trim();
+    const brand = document.getElementById("adminProdBrand").value.trim();
+    const category = document.getElementById("adminProdCategory").value;
+    const price = Number(document.getElementById("adminProdPrice").value);
+    const originalPrice = Number(document.getElementById("adminProdOriginalPrice").value);
+    const image = document.getElementById("adminProdImage").value.trim();
+    const description = document.getElementById("adminProdDesc").value.trim();
 
-        return `<div class="order-card-box ${s === 0 ? 'cancelled-order' : ''}"><div class="order-top-row"><div><span class="order-id-badge">Order ID: #${order.orderId}</span><span style="font-size:12px; color:#64748b; margin-left:12px;">Placed on: ${order.date}</span></div><div style="display:flex; align-items:center; gap:12px;"><span style="font-size:13px; font-weight:700; color:${statusColor}; background:${statusBg}; padding:4px 10px; border-radius:6px;">Status: ${statusText}</span><button class="details-btn" onclick="downloadOrderInvoice('${order.orderId}')" style="padding:6px 12px; border-radius:6px; font-size:11px; font-weight:700;">Download Invoice 📄</button>${cancelBtnHtml}</div></div><div class="order-items-grid">${itemsHtml}</div><div style="font-size:13px; color:#334155; margin-bottom:20px; background:#f8fafc; padding:12px 16px; border-radius:8px; border:1px solid #e2e8f0;"><strong>Shipping Address:</strong> ${order.address}, Kuthukalvalasai, TN - 627803 &nbsp;|&nbsp; <strong>Phone:</strong> ${order.phone}</div>${s === 0 ? `<div style="background:#fee2e2; color:#b91c1c; padding:12px; border-radius:8px; font-size:13px; font-weight:700; text-align:center;">This order has been cancelled successfully.</div>` : `<div class="visual-timeline"><div class="v-step ${s >= 1 ? 'active' : ''}"><div class="v-dot">${s > 1 ? '✓' : '1'}</div><span>Order Placed</span></div><div class="v-step ${s >= 2 ? 'active' : ''}"><div class="v-dot">${s > 2 ? '✓' : '2'}</div><span>Packed</span></div><div class="v-step ${s >= 3 ? 'active' : ''}"><div class="v-dot">${s > 3 ? '✓' : '3'}</div><span>Out for Delivery</span></div><div class="v-step ${s >= 4 ? 'active' : ''}"><div class="v-dot">✓</div><span>Delivered</span></div></div>`}</div>`;
-    }).join("");
+    try {
+        await addDoc(collection(db, "products"), { name, brand, category, price, originalPrice, image, description });
+        alert("Product added successfully!");
+        event.target.reset();
+        await loadProductsFromFirebase();
+    } catch(e) { console.error(e); alert("Failed to add product."); }
+};
+
+window.deleteProduct = async function(id) {
+    if(confirm("Are you sure you want to delete this product?")) {
+        try {
+            await deleteDoc(doc(db, "products", id));
+            alert("Product deleted.");
+            await loadProductsFromFirebase();
+        } catch(e) { alert("Failed to delete."); }
+    }
+};
+
+function renderAdminProductsList() {
+    const grid = document.getElementById("adminProductListGrid");
+    if(!grid) return;
+    grid.innerHTML = products.map(p => `
+        <div style="background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;">
+            <img src="${p.image}" width="100%" height="150" style="object-fit:cover; border-radius:8px;">
+            <h4 style="margin-top:10px;">${p.name}</h4>
+            <p>₹${p.price} (${p.brand})</p>
+            <button onclick="deleteProduct('${p.id}')" style="background:#dc2626; color:white; border:none; padding:6px 12px; border-radius:6px; margin-top:8px; cursor:pointer;">Delete Product</button>
+        </div>`).join("");
+}
+
+async function loadAllUsersOrdersForAdmin() {
+    try {
+        const snap = await getDocs(collection(db, "users"));
+        allUsersOrders = [];
+        snap.forEach(d => {
+            const data = d.data();
+            if(data.orders && Array.isArray(data.orders)) {
+                allUsersOrders.push(...data.orders);
+            }
+        });
+        renderAdminOrdersList();
+    } catch(e) { console.error(e); }
+}
+
+function renderAdminOrdersList() {
+    const container = document.getElementById("adminOrdersListContainer");
+    if(!container) return;
+    if(allUsersOrders.length === 0) { container.innerHTML = `<p>No customer orders yet.</p>`; return; }
+    container.innerHTML = allUsersOrders.map(o => `
+        <div style="background:white; padding:20px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
+            <h4>Order ID: #${o.orderId}</h4>
+            <p><strong>Customer:</strong> ${o.name} (${o.phone})</p>
+            <p><strong>Address:</strong> ${o.address}</p>
+            <p><strong>Date:</strong> ${o.date}</p>
+        </div>`).join("");
 }
 
 function updateCounters() {
@@ -507,40 +510,6 @@ function updateCounters() {
     if(document.getElementById("wishlistCount")) document.getElementById("wishlistCount").textContent = wishLen;
     if(document.getElementById("cartCount")) document.getElementById("cartCount").textContent = cartLen;
     if(document.getElementById("ordersCount")) document.getElementById("ordersCount").textContent = ordersLen;
-
-    if(document.getElementById("sidebarWishlistCount")) document.getElementById("sidebarWishlistCount").textContent = wishLen;
-    if(document.getElementById("sidebarCartCount")) document.getElementById("sidebarCartCount").textContent = cartLen;
-    if(document.getElementById("sidebarOrdersCount")) document.getElementById("sidebarOrdersCount").textContent = ordersLen;
 }
 
-window.toggleMobileMenu = function() {
-    const sidebar = document.getElementById("mobileMenuSidebar");
-    const overlay = document.getElementById("mobileMenuOverlay");
-    if(sidebar && overlay) { sidebar.classList.toggle("active"); overlay.classList.toggle("active"); }
-};
-
-function setupHeroSlider() { setInterval(() => { changeSlide(1); }, 5000); }
-function changeSlide(direction) {
-    const slides = document.querySelectorAll(".hero-slide"); const dots = document.querySelectorAll(".dot");
-    if (!slides.length) return;
-    slides[currentSlide].classList.remove("active"); dots[currentSlide].classList.remove("active");
-    currentSlide += direction;
-    if (currentSlide >= slides.length) currentSlide = 0; if (currentSlide < 0) currentSlide = slides.length - 1;
-    slides[currentSlide].classList.add("active"); dots[currentSlide].classList.add("active");
-}
-function goToSlide(index) {
-    const slides = document.querySelectorAll(".hero-slide"); const dots = document.querySelectorAll(".dot");
-    if (!slides[index]) return;
-    slides[currentSlide].classList.remove("active"); dots[currentSlide].classList.remove("active");
-    currentSlide = index;
-    slides[currentSlide].classList.add("active"); dots[currentSlide].classList.add("active");
-}
-
-function scrollToProducts() { showPage('home'); document.getElementById("products").scrollIntoView({ behavior: "smooth" }); }
-function scrollToCategories() { showPage('home'); document.getElementById("categories").scrollIntoView({ behavior: "smooth" }); }
-function scrollToAbout() { showPage('home'); document.getElementById("about").scrollIntoView({ behavior: "smooth" }); }
-function scrollToContact() { showPage('home'); document.getElementById("contact").scrollIntoView({ behavior: "smooth" }); }
-function focusSearch() { showPage('home'); const s = document.getElementById("searchInput"); s.focus(); s.scrollIntoView({ behavior: "smooth", block: "center" }); }
-function imageFallback(img) { if (img.dataset.fallbackUsed) return; img.dataset.fallbackUsed = "true"; img.src = "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=900&q=80"; }
-
-window.showPage = showPage; window.filterCategory = filterCategory; window.filterBrand = filterBrand; window.searchProducts = searchProducts; window.showAllProducts = showAllProducts; window.openProductDetail = openProductDetail; window.toggleWishlist = toggleWishlist; window.removeWishlist = removeWishlist; window.addToCart = addToCart; window.updateCartQty = updateCartQty; window.removeCartItem = removeCartItem; window.proceedToCheckout = proceedToCheckout; window.submitOrder = submitOrder; window.cancelOrder = cancelOrder; window.changeSlide = changeSlide; window.goToSlide = goToSlide; window.scrollToProducts = scrollToProducts; window.scrollToCategories = scrollToCategories; window.scrollToAbout = scrollToAbout; window.scrollToContact = scrollToContact; window.focusSearch = focusSearch; window.imageFallback = imageFallback; window.openAuthModal = openAuthModal; window.closeAuthModal = closeAuthModal; window.toggleAuthMode = toggleAuthMode; window.handleEmailAuth = handleEmailAuth; window.handleLogout = handleLogout; window.toggleProfileDropdown = toggleProfileDropdown; window.openAccountModal = openAccountModal; window.closeAccountModal = closeAccountModal; window.saveUserProfile = saveUserProfile;
+window.showPage = showPage; window.filterCategory = filterCategory; window.filterBrand = filterBrand; window.searchProducts = searchProducts; window.showAllProducts = showAllProducts; window.openProductDetail = openProductDetail; window.toggleWishlist = toggleWishlist; window.removeWishlist = removeWishlist; window.addToCart = addToCart; window.updateCartQty = updateCartQty; window.removeCartItem = removeCartItem; window.submitOrder = submitOrder; window.openAuthModal = openAuthModal; window.closeAuthModal = closeAuthModal; window.toggleAuthMode = toggleAuthMode; window.handleEmailAuth = handleEmailAuth; window.handleLogout = handleLogout; window.toggleProfileDropdown = toggleProfileDropdown; window.openAccountModal = openAccountModal; window.closeAccountModal = closeAccountModal; window.saveUserProfile = saveUserProfile;
