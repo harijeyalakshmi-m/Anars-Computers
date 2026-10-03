@@ -1,3 +1,7 @@
+/* =====================================================
+   ANARS COMPUTERS - MERGED SINGLE PAGE APP & ADMIN ENGINE
+===================================================== */
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
@@ -42,7 +46,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     setupHeroSlider();
 });
 
-// SAFE EVENT LISTENERS BINDING TO AVOID UNDEFINED ERROR
 function attachEventListeners() {
     const bindClick = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener("click", fn); };
 
@@ -133,7 +136,7 @@ onAuthStateChanged(auth, async (user) => {
                 </button>
                 <div id="profileDropdownMenu" class="profile-dropdown-menu">
                     <button onclick="openAccountModal()">My Profile</button>
-                    ${isAdmin ? `<button onclick="showPage('admin')" style="color:#16a34a; font-weight:800;">⚙️️ Admin Dashboard</button>` : ''}
+                    ${isAdmin ? `<button onclick="showPage('admin')" style="color:#16a34a; font-weight:800;">⚙ Admin Dashboard</button>` : ''}
                     <button onclick="handleLogout()" style="color:#dc2626;">Logout</button>
                 </div>
             `;
@@ -290,7 +293,7 @@ async function loadStoreMetadata() {
             }
         }
     } catch (e) { console.error("Error loading metadata: ", e); }
-    renderBrandFilters(); renderCategoriesGrid(); renderBrandLogosFrontEnd();
+    renderBrandFilters(); renderCategoriesGrid(); renderBrandLogosFrontEnd(); renderMetadataLists();
 }
 
 function renderBrandLogosFrontEnd() {
@@ -352,7 +355,7 @@ window.showPage = function (pageId) {
     else if (pageId === 'checkout') { renderCheckoutSummary(); document.getElementById("checkoutPage").classList.add("active"); }
     else if (pageId === 'success') { document.getElementById("successPage").classList.add("active"); }
     else if (pageId === 'orders') { renderMyOrdersPage(); document.getElementById("ordersPage").classList.add("active"); }
-    else if (pageId === 'admin') { document.getElementById("adminPage").classList.add("active"); loadAdminOrders(); loadAdminProducts(); loadAdminBrandLogos(); }
+    else if (pageId === 'admin') { document.getElementById("adminPage").classList.add("active"); loadAdminOrders(); loadAdminProducts(); loadAdminBrandLogos(); renderMetadataLists(); populateAdminDropdowns(); }
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -646,7 +649,7 @@ window.toggleMobileMenu = function () {
 };
 
 // =====================================================
-// ADMIN ENGINE MERGED (REAL-TIME GLOBAL FIREBASE SYNC)
+// ADMIN ENGINE MERGED (METADATA, BRANDS & CATEGORIES RESTORED)
 // =====================================================
 window.switchAdminTab = function (tab) {
     const oSec = document.getElementById("adminTabOrders");
@@ -662,7 +665,87 @@ window.switchAdminTab = function (tab) {
 
     if (tab === 'orders') loadAdminOrders();
     if (tab === 'products') loadAdminProducts();
-    if (tab === 'meta') loadAdminBrandLogos();
+    if (tab === 'meta') { loadAdminBrandLogos(); renderMetadataLists(); }
+};
+
+function renderMetadataLists() {
+    const bList = document.getElementById("brandsListContainer");
+    const cList = document.getElementById("categoriesListContainer");
+    if (bList) {
+        bList.innerHTML = storeBrands.map((brand, idx) => `<div class="meta-item-row" style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; margin-bottom:8px; font-weight:600; font-size:13px;"><span>${brand}</span><div style="display:flex; gap:6px;"><button class="action-btn edit-btn" onclick="editBrand(${idx})">Edit</button><button class="action-btn delete-btn" onclick="deleteBrand(${idx})">Delete</button></div></div>`).join("");
+    }
+    if (cList) {
+        cList.innerHTML = storeCategories.map((cat, idx) => `<div class="meta-item-row" style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; margin-bottom:8px; font-weight:600; font-size:13px;"><span>${cat}</span><div style="display:flex; gap:6px;"><button class="action-btn edit-btn" onclick="editCategory(${idx})">Edit</button><button class="action-btn delete-btn" onclick="deleteCategory(${idx})">Delete</button></div></div>`).join("");
+    }
+}
+
+async function saveMetadataToFirebase() {
+    try {
+        await setDoc(doc(db, "store_metadata", "config"), { brands: storeBrands, categories: storeCategories, brandLogos, isMarqueeEnabled, uiTheme }, { merge: true });
+        populateAdminDropdowns();
+        renderMetadataLists();
+        renderBrandFilters();
+        renderCategoriesGrid();
+    } catch (e) { console.error("Error saving metadata:", e); }
+}
+
+window.addNewBrandItem = async function () {
+    const bName = prompt("Enter brand name:");
+    if (bName && bName.trim() !== "") {
+        const formatted = bName.trim().toUpperCase();
+        if (!storeBrands.includes(formatted)) {
+            storeBrands.push(formatted);
+            await saveMetadataToFirebase();
+            alert("Brand added successfully!");
+        } else { alert("Brand already exists."); }
+    }
+};
+
+window.editBrand = async function (index) {
+    const updated = prompt("Edit brand name:", storeBrands[index]);
+    if (updated && updated.trim() !== "") {
+        storeBrands[index] = updated.trim().toUpperCase();
+        await saveMetadataToFirebase();
+        alert("Brand updated successfully!");
+    }
+};
+
+window.deleteBrand = async function (index) {
+    if (confirm(`Are you sure you want to delete brand "${storeBrands[index]}"?`)) {
+        storeBrands.splice(index, 1);
+        await saveMetadataToFirebase();
+        alert("Brand deleted successfully!");
+    }
+};
+
+window.addNewCategoryItem = async function () {
+    const cName = prompt("Enter category name:");
+    if (cName && cName.trim() !== "") {
+        const formatted = cName.trim();
+        const capitalCat = formatted.charAt(0).toUpperCase() + formatted.slice(1);
+        if (!storeCategories.includes(capitalCat)) {
+            storeCategories.push(capitalCat);
+            await saveMetadataToFirebase();
+            alert("Category added successfully!");
+        } else { alert("Category already exists."); }
+    }
+};
+
+window.editCategory = async function (index) {
+    const updated = prompt("Edit category name:", storeCategories[index]);
+    if (updated && updated.trim() !== "") {
+        storeCategories[index] = updated.trim();
+        await saveMetadataToFirebase();
+        alert("Category updated successfully!");
+    }
+};
+
+window.deleteCategory = async function (index) {
+    if (confirm(`Are you sure you want to delete category "${storeCategories[index]}"?`)) {
+        storeCategories.splice(index, 1);
+        await saveMetadataToFirebase();
+        alert("Category deleted successfully!");
+    }
 };
 
 async function loadAdminOrders() {
@@ -829,7 +912,7 @@ function loadAdminBrandLogos() {
 
 window.toggleMarquee = async function () {
     isMarqueeEnabled = document.getElementById("admMarqueeToggle").checked;
-    await setDoc(doc(db, "store_metadata", "config"), { brands: storeBrands, categories: storeCategories, brandLogos, isMarqueeEnabled, uiTheme }, { merge: true });
+    await saveMetadataToFirebase();
     renderBrandLogosFrontEnd();
 };
 
@@ -839,7 +922,7 @@ window.addBrandLogo = async function () {
     const pos = Number(document.getElementById("logoPos").value);
     if (!name || !url) return alert("Fill name & URL");
     brandLogos.push({ name, url, pos });
-    await setDoc(doc(db, "store_metadata", "config"), { brands: storeBrands, categories: storeCategories, brandLogos, isMarqueeEnabled, uiTheme }, { merge: true });
+    await saveMetadataToFirebase();
     loadAdminBrandLogos();
     renderBrandLogosFrontEnd();
     alert("Logo added!");
@@ -847,7 +930,7 @@ window.addBrandLogo = async function () {
 
 window.deleteBrandLogo = async function (name) {
     brandLogos = brandLogos.filter(l => l.name !== name);
-    await setDoc(doc(db, "store_metadata", "config"), { brands: storeBrands, categories: storeCategories, brandLogos, isMarqueeEnabled, uiTheme }, { merge: true });
+    await saveMetadataToFirebase();
     loadAdminBrandLogos();
     renderBrandLogosFrontEnd();
 };
@@ -855,7 +938,7 @@ window.deleteBrandLogo = async function (name) {
 window.updateUITheme = async function (val) {
     uiTheme = val;
     document.body.setAttribute('data-theme', uiTheme);
-    await setDoc(doc(db, "store_metadata", "config"), { brands: storeBrands, categories: storeCategories, brandLogos, isMarqueeEnabled, uiTheme }, { merge: true });
+    await saveMetadataToFirebase();
     alert("Theme updated to " + val);
 };
 
