@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Anars Computers | Kuthukalvalasai IT Store</title>
     <meta name="description"
-        content="Anars Computers in Kuthukalvalasai - Buy Laptops, Desktops, RAM, SSDs, and CCTV Cameras at the best price.">
+        content="Anars Computers in Kuthukalvalasai - Buy Laptops, Desktops, RAM, SSDs, and CCTV Cameras at the best price with official warranty.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,7 +34,7 @@
     <header class="header">
         <div class="container header-inner">
             <div style="display:flex; align-items:center; gap:14px;">
-                <button class="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Open Mobile Menu">
+                <button class="hamburger-btn" id="hamburgerToggleBtn" aria-label="Open Mobile Menu">
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.5"
                         stroke-linecap="round" stroke-linejoin="round">
                         <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -42,29 +42,29 @@
                         <line x1="3" y1="18" x2="21" y2="18"></line>
                     </svg>
                 </button>
-                <a href="#home" class="logo" onclick="showPage('home')" aria-label="Anars Computers Home">
+                <a href="#home" class="logo" id="logoHomeLink" aria-label="Anars Computers Home">
                     <span class="logo-main">ANARS</span>
                     <span class="logo-sub">COMPUTERS</span>
                 </a>
             </div>
 
             <nav class="main-nav">
-                <a href="#home" onclick="showPage('home')">Home</a>
-                <a href="#products" onclick="scrollToProducts()">Products</a>
-                <a href="#categories" onclick="scrollToCategories()">Categories</a>
-                <a href="#orders" onclick="showPage('orders')">My Orders</a>
-                <a href="#about" onclick="scrollToAbout()">About</a>
-                <a href="#contact" onclick="scrollToContact()">Contact</a>
+                <a href="#home" id="navHomeLink">Home</a>
+                <a href="#products" id="navProductsLink">Products</a>
+                <a href="#categories" id="navCategoriesLink">Categories</a>
+                <a href="#orders" id="navOrdersLink">My Orders</a>
+                <a href="#about" id="navAboutLink">About</a>
+                <a href="#contact" id="navContactLink">Contact</a>
             </nav>
 
             <div class="header-actions">
                 <div class="desktop-only-actions">
-                    <button class="header-btn" onclick="focusSearch()" aria-label="Search">Search</button>
-                    <button class="header-btn" onclick="showPage('orders')">Orders <span id="ordersCount"
+                    <button class="header-btn" id="headerSearchBtn" aria-label="Search">Search</button>
+                    <button class="header-btn" id="headerOrdersBtn">Orders <span id="ordersCount"
                             class="badge">0</span></button>
-                    <button class="header-btn" onclick="showPage('wishlist')">Wishlist <span id="wishlistCount"
+                    <button class="header-btn" id="headerWishlistBtn">Wishlist <span id="wishlistCount"
                             class="badge">0</span></button>
-                    <button class="header-btn" onclick="showPage('cart')">Cart <span id="cartCount"
+                    <button class="header-btn" id="headerCartBtn">Cart <span id="cartCount"
                             class="badge">0</span></button>
                 </div>
                 <div id="authButtonContainer" class="profile-dropdown-wrapper"></div>
@@ -85,7 +85,7 @@
                             <h1>Build Your<br>Ultimate Gaming Rig</h1>
                             <p>High-performance Laptops, Custom Desktop PCs, Components, and Expert IT Solutions right
                                 at your doorstep.</p>
-                            <button class="primary-btn" onclick="scrollToProducts()">Explore Products</button>
+                            <button class="primary-btn" id="heroExploreBtn">Explore Products</button>
                         </div>
                     </div>
                     <div class="hero-slide"
@@ -95,16 +95,15 @@
                             <span class="hero-tag">LAPTOPS & WORKSTATIONS</span>
                             <h1>Power Your<br>Workflow</h1>
                             <p>Top brand laptops from ASUS, HP, Lenovo, and Dell with official warranty.</p>
-                            <button class="primary-btn" onclick="filterCategory('Laptops')">Shop Laptops</button>
+                            <button class="primary-btn" id="heroLaptopsBtn">Shop Laptops</button>
                         </div>
                     </div>
-                    <button class="slider-btn slider-prev" onclick="changeSlide(-1)"
+                    <button class="slider-btn slider-prev" id="sliderPrevBtn"
                         aria-label="Previous Slide">&#10094;</button>
-                    <button class="slider-btn slider-next" onclick="changeSlide(1)"
-                        aria-label="Next Slide">&#10095;</button>
-                    <div class="slider-dots">
-                        <button onclick="goToSlide(0)" class="dot active" aria-label="Slide 1"></button>
-                        <button onclick="goToSlide(1)" class="dot" aria-label="Slide 2"></button>
+                    <button class="slider-btn slider-next" id="sliderNextBtn" aria-label="Next Slide">&#10095;</button>
+                    <div class="slider-dots" id="sliderDotsContainer">
+                        <button class="dot active" data-index="0" aria-label="Slide 1"></button>
+                        <button class="dot" data-index="1" aria-label="Slide 2"></button>
                     </div>
                 </div>
             </section>
@@ -121,9 +120,8 @@
                 <div class="container">
                     <div class="search-box">
                         <input type="text" id="searchInput"
-                            placeholder="Search laptops, computers, RAM, brands, CCTV..." oninput="searchProducts()"
-                            aria-label="Search Products">
-                        <button onclick="searchProducts()" aria-label="Search Button">Search</button>
+                            placeholder="Search laptops, computers, RAM, brands, CCTV..." aria-label="Search Products">
+                        <button id="searchActionBtn" aria-label="Search Button">Search</button>
                     </div>
                 </div>
             </section>
@@ -146,14 +144,14 @@
                             <p class="section-small">FEATURED CATALOG</p>
                             <h2 id="productHeading">All Products</h2>
                         </div>
-                        <button class="clear-filter" onclick="showAllProducts()">View All Products</button>
+                        <button class="clear-filter" id="viewAllProductsBtn">View All Products</button>
                     </div>
                     <div id="brandFilters" class="brand-filters"></div>
                     <div id="productGrid" class="product-grid"></div>
                     <div id="noProducts" class="no-products">
                         <h3>No products found</h3>
                         <p>Try searching another keyword or brand.</p>
-                        <button onclick="showAllProducts()" class="primary-btn">View All</button>
+                        <button id="noProductsViewAllBtn" class="primary-btn">View All</button>
                     </div>
                 </div>
             </section>
@@ -230,13 +228,13 @@
 
         <!-- OTHER STORE PAGES -->
         <div id="detailPage" class="page-view">
-            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">←
+            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" id="backToStoreDetailBtn">←
                     Back to Store</button>
                 <div id="productDetailContainer"></div>
             </div>
         </div>
         <div id="cartPage" class="page-view">
-            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">←
+            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" id="backToStoreCartBtn">←
                     Continue Shopping</button>
                 <div class="cart-page-header">
                     <h2>Shopping Cart</h2>
@@ -245,8 +243,8 @@
             </div>
         </div>
         <div id="wishlistPage" class="page-view">
-            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">←
-                    Continue Shopping</button>
+            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn"
+                    id="backToStoreWishlistBtn">← Continue Shopping</button>
                 <div class="cart-page-header">
                     <h2>My Saved Wishlist</h2>
                 </div>
@@ -254,7 +252,7 @@
             </div>
         </div>
         <div id="checkoutPage" class="page-view">
-            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('cart')">←
+            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" id="backToCartCheckoutBtn">←
                     Back to Cart</button>
                 <div class="cart-page-header">
                     <h2>Shipping & Checkout Details</h2>
@@ -279,13 +277,13 @@
                     <div class="success-icon">✓</div>
                     <h2>Order Placed Successfully!</h2>
                     <p>Your Order ID is <span id="confirmedOrderId" style="font-weight:700; color:#2563eb;"></span></p>
-                    <button class="primary-btn" onclick="showPage('home')" style="margin:20px auto 0;">Return to
+                    <button class="primary-btn" id="successReturnStoreBtn" style="margin:20px auto 0;">Return to
                         Store</button>
                 </div>
             </div>
         </div>
         <div id="ordersPage" class="page-view">
-            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">←
+            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" id="backToStoreOrdersBtn">←
                     Back to Store</button>
                 <div class="cart-page-header">
                     <h2>My Orders & Invoices</h2>
@@ -294,10 +292,10 @@
             </div>
         </div>
 
-        <!-- 🌟 MERGED ADMIN DASHBOARD VIEW (FULLY RESPONSIVE) 🌟 -->
+        <!-- 🌟 MERGED ADMIN DASHBOARD VIEW 🌟 -->
         <div id="adminPage" class="page-view">
             <div class="container" style="padding: 40px 0;">
-                <button class="back-btn" onclick="showPage('home')">← Back to Storefront</button>
+                <button class="back-btn" id="backToStoreAdminBtn">← Back to Storefront</button>
                 <div class="cart-page-header">
                     <h2>Store Management Dashboard</h2>
                 </div>
@@ -323,7 +321,7 @@
                     </div>
                 </div>
 
-                <div class="admin-tab-buttons" style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
+                <div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
                     <button id="btnTabOrders" class="primary-btn" style="padding: 10px 20px;"
                         onclick="switchAdminTab('orders')">Live Orders</button>
                     <button id="btnTabProducts" class="primary-btn" style="background:#334155; padding: 10px 20px;"
@@ -466,20 +464,20 @@
     <!-- FULL-SCREEN AUTH MODAL (WITH FORGOT PASSWORD) -->
     <div id="authModal" class="fs-overlay">
         <div class="fs-auth-container">
+            <button onclick="closeAuthModal()" class="fs-close-btn" aria-label="Close Modal">✕</button>
             <div class="fs-auth-left">
                 <div style="position: relative; z-index: 2;">
                     <span
                         style="font-size: 14px; font-weight: 800; letter-spacing: 3px; color: #38bdf8; text-transform: uppercase;">Anars
                         Computers</span>
-                    <h1 style="font-size: 48px; font-weight: 800; line-height: 1.1; margin: 20px 0;">Your
+                    <h1 style="font-size: 42px; font-weight: 800; line-height: 1.1; margin: 20px 0;">Your
                         Ultimate<br>Tech Destination.</h1>
                 </div>
             </div>
             <div class="fs-auth-right">
-                <button onclick="closeAuthModal()" class="fs-close-btn" aria-label="Close Modal">✕</button>
                 <div class="fs-form-box">
                     <h3 id="authModalTitle"
-                        style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Customer Login
+                        style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Customer Login
                     </h3>
                     <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;" id="authSubtitle">Please enter your
                         details to continue.</p>
@@ -539,15 +537,15 @@
         </div>
         <div class="mobile-menu-links">
             <div class="mobile-sidebar-search"><input type="text" id="mobileSearchInputSidebar"
-                    placeholder="Search store..." oninput="searchProductsMobile()" aria-label="Mobile Search"></div>
-            <a href="#home" onclick="showPage('home'); toggleMobileMenu();">
+                    placeholder="Search store..." aria-label="Mobile Search"></div>
+            <a href="#home" id="sidebarHomeLink">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg> <span>Home</span>
             </a>
-            <a href="#products" onclick="scrollToProducts(); toggleMobileMenu();">
+            <a href="#products" id="sidebarProductsLink">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
@@ -555,7 +553,7 @@
                     <line x1="12" y1="17" x2="12" y2="21"></line>
                 </svg> <span>Store Products</span>
             </a>
-            <a href="#categories" onclick="scrollToCategories(); toggleMobileMenu();">
+            <a href="#categories" id="sidebarCategoriesLink">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="3" width="7" height="7"></rect>
@@ -565,7 +563,7 @@
                 </svg> <span>Top Categories</span>
             </a>
             <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 10px 0;">
-            <a href="#orders" onclick="showPage('orders'); toggleMobileMenu();" class="sidebar-badge-link">
+            <a href="#orders" id="sidebarOrdersLink" class="sidebar-badge-link">
                 <div style="display:flex; align-items:center; gap:10px;"><svg width="18" height="18" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2">
                         <path
@@ -574,7 +572,7 @@
                     </svg> <span>My Orders</span></div>
                 <span class="sidebar-badge" id="sidebarOrdersCount">0</span>
             </a>
-            <a href="#wishlist" onclick="showPage('wishlist'); toggleMobileMenu();" class="sidebar-badge-link">
+            <a href="#wishlist" id="sidebarWishlistLink" class="sidebar-badge-link">
                 <div style="display:flex; align-items:center; gap:10px;"><svg width="18" height="18" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2">
                         <path
@@ -583,7 +581,7 @@
                     </svg> <span>Wishlist</span></div>
                 <span class="sidebar-badge" id="sidebarWishlistCount">0</span>
             </a>
-            <a href="#cart" onclick="showPage('cart'); toggleMobileMenu();" class="sidebar-badge-link">
+            <a href="#cart" id="sidebarCartLink" class="sidebar-badge-link">
                 <div style="display:flex; align-items:center; gap:10px;"><svg width="18" height="18" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="9" cy="21" r="1"></circle>
@@ -593,14 +591,14 @@
                 <span class="sidebar-badge" id="sidebarCartCount">0</span>
             </a>
             <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 10px 0;">
-            <a href="#about" onclick="scrollToAbout(); toggleMobileMenu();"><svg width="18" height="18"
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <a href="#about" id="sidebarAboutLink"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
                     <path d="M12 16v-4"></path>
                     <path d="M12 8h.01"></path>
                 </svg> <span>About Store</span></a>
-            <a href="#contact" onclick="scrollToContact(); toggleMobileMenu();"><svg width="18" height="18"
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <a href="#contact" id="sidebarContactLink"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
                     <path
                         d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
                     </path>
@@ -608,16 +606,16 @@
         </div>
     </div>
 
-    <!-- MOBILE BOTTOM NAVIGATION (SVG ICONS INSTEAD OF EMOJIS) -->
+    <!-- MOBILE BOTTOM NAVIGATION -->
     <div class="mobile-bottom-nav">
-        <a href="#home" onclick="showPage('home')">
+        <a href="#home" id="bottomNavHome">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             </svg>
             <span>Home</span>
         </a>
-        <a href="#products" onclick="scrollToProducts()">
+        <a href="#products" id="bottomNavProducts">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
@@ -626,7 +624,7 @@
             </svg>
             <span>Products</span>
         </a>
-        <a href="#orders" onclick="showPage('orders')">
+        <a href="#orders" id="bottomNavOrders">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -635,7 +633,7 @@
             </svg>
             <span>Orders</span>
         </a>
-        <a href="#cart" onclick="showPage('cart')">
+        <a href="#cart" id="bottomNavCart">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="9" cy="21" r="1"></circle>
@@ -646,24 +644,37 @@
         </a>
     </div>
 
+    <!-- PROFESSIONAL FOOTER -->
     <footer class="footer reveal">
         <div class="container footer-grid">
             <div>
                 <div class="footer-logo">ANARS COMPUTERS</div>
-                <p>Annai Complex, Kuthukalvalasai, TN 627803</p>
+                <p style="color: #94a3b8; font-size: 14px; line-height: 1.7; margin-bottom: 16px;">Your premier
+                    destination for high-performance laptops, custom gaming rigs, computer peripherals, and reliable IT
+                    security solutions in Kuthukalvalasai.</p>
+                <p style="color: #e2e8f0; font-size: 13px; font-weight: 600;">📍 Annai Complex, Kuthukalvalasai, TN
+                    627803</p>
+                <p style="color: #38bdf8; font-size: 13px; font-weight: 700; margin-top: 6px;">📞 091503 03600</p>
             </div>
             <div>
-                <h4>Categories</h4><a href="#products"
-                    onclick="showPage('home'); filterCategory('Laptops')">Laptops</a><a href="#products"
-                    onclick="showPage('home'); filterCategory('CCTV')">CCTV</a>
+                <h4>Quick Links</h4>
+                <a href="#home" id="footerHomeLink">Home Store</a>
+                <a href="#products" id="footerProductsLink">Catalog & Products</a>
+                <a href="#categories" id="footerCategoriesLink">Categories</a>
+                <a href="#about" id="footerAboutLink">About Us</a>
+                <a href="#contact" id="footerContactLink">Store Location & Map</a>
             </div>
             <div>
-                <h4>Support</h4><a href="#orders" onclick="showPage('orders')">My Orders</a><a href="#contact"
-                    onclick="scrollToContact()">Store Location</a>
+                <h4>Customer Services</h4>
+                <a href="#orders" id="footerOrdersLink">Track My Orders</a>
+                <a href="#cart" id="footerCartLink">Shopping Cart</a>
+                <a href="#wishlist" id="footerWishlistLink">Saved Wishlist</a>
+                <a href="javascript:void(0)" onclick="openAuthModal()">Customer Login</a>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>© 2026 Anars Computers, Kuthukalvalasai. All Rights Reserved.</p>
+        <div class="footer-bottom"
+            style="text-align: center; border-top: 1px solid rgba(255,255,255,0.08); padding: 24px 0; margin-top: 40px; font-size: 13px; color: #64748b;">
+            <p>© 2026 Anars Computers, Kuthukalvalasai. All Rights Reserved. Designed for Ultimate IT Solutions.</p>
         </div>
     </footer>
 
