@@ -47,7 +47,7 @@ onAuthStateChanged(auth, async (user) => {
     const authBtnContainer = document.getElementById("authButtonContainer");
 
     if (user) {
-        const isAdmin = user.email === ADMIN_EMAIL;
+        const isAdmin = (user.email === ADMIN_EMAIL);
         const userDocRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userDocRef);
         
@@ -68,7 +68,7 @@ onAuthStateChanged(auth, async (user) => {
                 </button>
                 <div id="profileDropdownMenu" class="profile-dropdown-menu">
                     <button onclick="openAccountModal()">My Profile</button>
-                    ${isAdmin ? `<button onclick="window.location.href='./admin.html'" style="color:#16a34a; font-weight:800;">Admin Dashboard</button>` : ''}
+                    ${isAdmin ? `<a href="admin.html" style="display:block; padding:13px 18px; color:#16a34a; font-weight:800; text-decoration:none; font-size:13px;">⚙️ Admin Dashboard</a>` : ''}
                     <button onclick="handleLogout()" style="color:#dc2626;">Logout</button>
                 </div>
             `;
