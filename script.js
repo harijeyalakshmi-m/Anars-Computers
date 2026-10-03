@@ -11,11 +11,15 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// 🌟 UPDATE: Exact Admin Email Added Here 🌟
+const ADMIN_EMAIL = "mharijeyalakshmi@gmail.com"; 
+
 let currentUser = null;
 let isRegisterMode = false;
 let products = [];
 let storeBrands = ["ASUS", "HP", "LENOVO", "DELL", "KINGSTON", "CORSAIR", "SAMSUNG", "HIKVISION"];
 let storeCategories = ["Laptops", "Computers", "RAM", "Storage", "Motherboard", "CCTV", "Bluetooth"];
+
 let brandLogos = [];
 let isMarqueeEnabled = true;
 
@@ -24,6 +28,7 @@ let currentBrand = "All";
 let currentSearch = "";
 let wishlist = [];
 let cart = [];
+let orders = []; // Live Synced Firebase Orders
 let productReviews = JSON.parse(localStorage.getItem("anarsProductReviews") || "{}");
 let currentSlide = 0;
 
@@ -43,16 +48,18 @@ onAuthStateChanged(auth, async (user) => {
     const authBtnContainer = document.getElementById("authButtonContainer");
 
     if (user) {
+        const isAdmin = user.email === ADMIN_EMAIL;
         const userDocRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userDocRef);
+        
         if (userSnap.exists()) {
             const data = userSnap.data();
             cart = data.cart || [];
             wishlist = data.wishlist || [];
-            // Orders removed from Firebase fetch to sync with global LocalStorage for Admin Panel
+            orders = data.orders || []; 
         } else {
-            await setDoc(userDocRef, { email: user.email, name: "", phone: "", cart: [], wishlist: [] });
-            cart = []; wishlist = [];
+            await setDoc(userDocRef, { email: user.email, name: "", phone: "", cart: [], wishlist: [], orders: [] });
+            cart = []; wishlist = []; orders = [];
         }
 
         if (authBtnContainer) {
@@ -62,6 +69,7 @@ onAuthStateChanged(auth, async (user) => {
                 </button>
                 <div id="profileDropdownMenu" class="profile-dropdown-menu">
                     <button onclick="openAccountModal()">My Profile</button>
+                    ${isAdmin ? `<button onclick="window.location.href='admin.html'" style="color:#16a34a; font-weight:800;">⚙️ Admin Dashboard</button>` : ''}
                     <button onclick="handleLogout()" style="color:#dc2626;">Logout</button>
                 </div>
             `;
@@ -78,7 +86,7 @@ onAuthStateChanged(auth, async (user) => {
             `;
             document.getElementById("loginToggleBtn").addEventListener("click", () => { openAuthModal(); });
         }
-        cart = []; wishlist = [];
+        cart = []; wishlist = []; orders = [];
     }
     updateCounters();
     if (document.getElementById("cartPage").classList.contains("active")) renderCartPage();
@@ -88,7 +96,7 @@ onAuthStateChanged(auth, async (user) => {
 
 async function saveUserDataToCloud() {
     if (!currentUser) return;
-    try { await updateDoc(doc(db, "users", currentUser.uid), { cart, wishlist }); } 
+    try { await updateDoc(doc(db, "users", currentUser.uid), { cart, wishlist, orders }); } 
     catch (e) { console.error("Error saving to cloud:", e); }
 }
 
@@ -103,12 +111,8 @@ window.toggleAuthMode = function() {
     const title = document.getElementById("authModalTitle");
     const btn = document.getElementById("authSubmitBtn");
     const switchText = document.getElementById("authSwitchText");
-
-    if (isRegisterMode) {
-        title.textContent = "Create New Account"; btn.textContent = "Register Account"; switchText.textContent = "Already have an account?";
-    } else {
-        title.textContent = "Customer Login"; btn.textContent = "Login to Store"; switchText.textContent = "Don't have an account?";
-    }
+    if (isRegisterMode) { title.textContent = "Create New Account"; btn.textContent = "Register Account"; switchText.textContent = "Already have an account?"; } 
+    else { title.textContent = "Customer Login"; btn.textContent = "Login to Store"; switchText.textContent = "Don't have an account?"; }
 };
 
 window.handleEmailAuth = async function(event) {
@@ -118,13 +122,18 @@ window.handleEmailAuth = async function(event) {
     try {
         if (isRegisterMode) {
             const res = await createUserWithEmailAndPassword(auth, email, password);
-            await setDoc(doc(db, "users", res.user.uid), { email, name: "", phone: "", cart: [], wishlist: [] });
+            await setDoc(doc(db, "users", res.user.uid), { email, name: "", phone: "", cart: [], wishlist: [], orders: [] });
             alert("Account registered successfully!");
+            closeAuthModal();
+            // 🌟 ADMIN AUTO-REDIRECT ON SIGN UP 🌟
+            if (email === ADMIN_EMAIL) { window.location.href = "admin.html"; }
         } else {
             await signInWithEmailAndPassword(auth, email, password);
             alert("Logged in successfully!");
+            closeAuthModal();
+            // 🌟 ADMIN AUTO-REDIRECT ON LOGIN 🌟
+            if (email === ADMIN_EMAIL) { window.location.href = "admin.html"; }
         }
-        closeAuthModal();
     } catch (e) { console.error("Auth Error:", e); alert("Authentication failed: " + e.message); }
 };
 
@@ -148,7 +157,7 @@ window.openAccountModal = async function() {
         <div class="fs-profile-group"><label>Full Legal Name</label><input type="text" id="profName" value="${data.name || ''}" placeholder="Enter your full name"></div>
         <div class="fs-profile-group"><label>Primary Email Address</label><input type="email" value="${currentUser.email}" disabled style="background:#e2e8f0; cursor:not-allowed; color:#64748b;"></div>
         <div class="fs-profile-group"><label>Mobile Number</label><input type="tel" id="profPhone" value="${data.phone || ''}" placeholder="10-digit mobile number"></div>
-        <div class="fs-profile-group"><label>Secure User ID (Auto-Generated)</label><input type="text" value="${currentUser.uid}" disabled style="background:#e2e8f0; font-size:12px; cursor:not-allowed; color:#64748b;"></div>
+        <div class="fs-profile-group"><label>Secure User ID</label><input type="text" value="${currentUser.uid}" disabled style="background:#e2e8f0; font-size:12px; cursor:not-allowed; color:#64748b;"></div>
     `;
     modal.classList.add("active");
 };
@@ -183,18 +192,11 @@ function renderBrandLogosFrontEnd() {
     const trackWrapper = document.getElementById("brandLogosTrack");
     if (!section || !trackWrapper) return;
     if (brandLogos.length === 0) { section.style.display = "none"; return; }
-    
     section.style.display = "block";
     const sortedLogos = [...brandLogos].sort((a, b) => a.pos - b.pos);
     let html = sortedLogos.map(l => `<div class="brand-logo-item" title="${l.name}"><img src="${l.url}" alt="${l.name}" width="120" height="40" loading="lazy"></div>`).join("");
-    
-    if (isMarqueeEnabled) { 
-        trackWrapper.innerHTML = `<div class="brand-track-inner">${html}</div><div class="brand-track-inner">${html}</div>`; 
-        trackWrapper.className = "brand-track marquee-active"; 
-    } else { 
-        trackWrapper.innerHTML = html; 
-        trackWrapper.className = "brand-track static"; 
-    }
+    if (isMarqueeEnabled) { trackWrapper.innerHTML = `<div class="brand-track-inner">${html}</div><div class="brand-track-inner">${html}</div>`; trackWrapper.className = "brand-track marquee-active"; } 
+    else { trackWrapper.innerHTML = html; trackWrapper.className = "brand-track static"; }
 }
 
 async function loadProductsFromFirebase() {
@@ -242,7 +244,6 @@ function renderProducts() {
     const grid = document.getElementById("productGrid");
     const noProducts = document.getElementById("noProducts");
     const heading = document.getElementById("productHeading");
-
     let filtered = products.filter(product => {
         const categoryMatch = currentCategory === "All" || product.category === currentCategory;
         const brandMatch = currentBrand === "All" || product.brand.toLowerCase() === currentBrand.toLowerCase();
@@ -254,22 +255,13 @@ function renderProducts() {
     heading.textContent = currentCategory === "All" ? "All Products" : currentCategory;
     if (filtered.length === 0) { grid.innerHTML = ""; noProducts.style.display = "block"; return; }
     noProducts.style.display = "none";
-    
     grid.innerHTML = filtered.map(product => {
         const isWishlisted = wishlist.includes(product.id);
         const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
         return `
             <article class="product-card">
-                <div class="product-image">
-                    <img src="${product.image}" alt="${product.name}" onerror="imageFallback(this)" loading="lazy" width="300" height="220">
-                    <button class="wishlist-button ${isWishlisted ? "active" : ""}" onclick="toggleWishlist('${product.id}')" aria-label="Toggle Wishlist">♥</button>
-                </div>
-                <div class="product-info">
-                    <div class="product-brand">${product.brand}</div>
-                    <h3 onclick="openProductDetail('${product.id}')">${product.name}</h3>
-                    <div class="product-price">₹${Number(product.price).toLocaleString("en-IN")} <span style="font-size:12px; color:#94a3b8; text-decoration:line-through; margin-left:6px;">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span> <span style="font-size:12px; color:#16a34a; margin-left:6px; font-weight:700;">${discount}% off</span></div>
-                    <div class="product-actions"><button class="details-btn" onclick="openProductDetail('${product.id}')">Details</button><button class="cart-btn" onclick="addToCart('${product.id}')">Add to Cart</button></div>
-                </div>
+                <div class="product-image"><img src="${product.image}" alt="${product.name}" onerror="imageFallback(this)" loading="lazy" width="300" height="220"><button class="wishlist-button ${isWishlisted ? "active" : ""}" onclick="toggleWishlist('${product.id}')" aria-label="Toggle Wishlist">♥</button></div>
+                <div class="product-info"><div class="product-brand">${product.brand}</div><h3 onclick="openProductDetail('${product.id}')">${product.name}</h3><div class="product-price">₹${Number(product.price).toLocaleString("en-IN")} <span style="font-size:12px; color:#94a3b8; text-decoration:line-through; margin-left:6px;">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span> <span style="font-size:12px; color:#16a34a; margin-left:6px; font-weight:700;">${discount}% off</span></div><div class="product-actions"><button class="details-btn" onclick="openProductDetail('${product.id}')">Details</button><button class="cart-btn" onclick="addToCart('${product.id}')">Add to Cart</button></div></div>
             </article>
         `;
     }).join("");
@@ -460,7 +452,6 @@ function renderCheckoutSummary() {
     document.getElementById("checkoutSummarySidebar").innerHTML = `<h3>Order Summary</h3><div class="fk-price-row-item"><span>Total MRP</span><span>₹${totalMRP.toLocaleString("en-IN")}</span></div><div class="fk-price-row-item total"><span>Payable Amount</span><span>₹${totalDiscountPrice.toLocaleString("en-IN")}</span></div>`;
 }
 
-// BUG FIX: Synchronizing Live Orders between Admin LocalStorage and User Account properly
 function submitOrder(event) {
     event.preventDefault();
     if (!currentUser) return openAuthModal();
@@ -470,17 +461,15 @@ function submitOrder(event) {
     const address = document.getElementById("shipAddress").value.trim();
     const orderId = "ANARS-" + Math.floor(1000 + Math.random() * 9000);
 
-    // Save with UID reference
     const newOrder = { 
         orderId, 
-        userId: currentUser.uid, // Tie order to user account
+        userId: currentUser.uid,
         date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }), 
         name, phone, address, 
         items: [...cart], 
         statusIndex: 1 
     };
     
-    // Add to Global Admin Storage
     let globalOrders = JSON.parse(localStorage.getItem("anarsOrders") || "[]");
     globalOrders.unshift(newOrder); 
     localStorage.setItem("anarsOrders", JSON.stringify(globalOrders));
@@ -494,7 +483,6 @@ function cancelOrder(orderId) {
     if (confirm("Are you sure you want to cancel this order?")) {
         let globalOrders = JSON.parse(localStorage.getItem("anarsOrders") || "[]");
         const order = globalOrders.find(o => o.orderId === orderId);
-        // Security check
         if (order && order.userId === currentUser.uid) { 
             order.statusIndex = 0; 
             localStorage.setItem("anarsOrders", JSON.stringify(globalOrders));
@@ -526,7 +514,6 @@ function renderMyOrdersPage() {
     const container = document.getElementById("myOrdersListContainer");
     if (!currentUser) { container.innerHTML = `<div class="fk-empty-cart"><h3>Please login to view your orders!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="openAuthModal()">Login</button></div>`; return; }
 
-    // Fetch live orders that belong ONLY to this user
     let globalOrders = JSON.parse(localStorage.getItem("anarsOrders") || "[]");
     let myOrders = globalOrders.filter(o => o.userId === currentUser.uid);
 
@@ -598,34 +585,4 @@ function scrollToContact() { showPage('home'); document.getElementById("contact"
 function focusSearch() { showPage('home'); const s = document.getElementById("searchInput"); s.focus(); s.scrollIntoView({ behavior: "smooth", block: "center" }); }
 function imageFallback(img) { if (img.dataset.fallbackUsed) return; img.dataset.fallbackUsed = "true"; img.src = "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=900&q=80"; }
 
-window.showPage = showPage;
-window.filterCategory = filterCategory;
-window.filterBrand = filterBrand;
-window.searchProducts = searchProducts;
-window.showAllProducts = showAllProducts;
-window.openProductDetail = openProductDetail;
-window.toggleWishlist = toggleWishlist;
-window.removeWishlist = removeWishlist;
-window.addToCart = addToCart;
-window.updateCartQty = updateCartQty;
-window.removeCartItem = removeCartItem;
-window.proceedToCheckout = proceedToCheckout;
-window.submitOrder = submitOrder;
-window.cancelOrder = cancelOrder;
-window.changeSlide = changeSlide;
-window.goToSlide = goToSlide;
-window.scrollToProducts = scrollToProducts;
-window.scrollToCategories = scrollToCategories;
-window.scrollToAbout = scrollToAbout;
-window.scrollToContact = scrollToContact;
-window.focusSearch = focusSearch;
-window.imageFallback = imageFallback;
-window.openAuthModal = openAuthModal;
-window.closeAuthModal = closeAuthModal;
-window.toggleAuthMode = toggleAuthMode;
-window.handleEmailAuth = handleEmailAuth;
-window.handleLogout = handleLogout;
-window.toggleProfileDropdown = toggleProfileDropdown;
-window.openAccountModal = openAccountModal;
-window.closeAccountModal = closeAccountModal;
-window.saveUserProfile = saveUserProfile;
+window.showPage = showPage; window.filterCategory = filterCategory; window.filterBrand = filterBrand; window.searchProducts = searchProducts; window.showAllProducts = showAllProducts; window.openProductDetail = openProductDetail; window.toggleWishlist = toggleWishlist; window.removeWishlist = removeWishlist; window.addToCart = addToCart; window.updateCartQty = updateCartQty; window.removeCartItem = removeCartItem; window.proceedToCheckout = proceedToCheckout; window.submitOrder = submitOrder; window.cancelOrder = cancelOrder; window.changeSlide = changeSlide; window.goToSlide = goToSlide; window.scrollToProducts = scrollToProducts; window.scrollToCategories = scrollToCategories; window.scrollToAbout = scrollToAbout; window.scrollToContact = scrollToContact; window.focusSearch = focusSearch; window.imageFallback = imageFallback; window.openAuthModal = openAuthModal; window.closeAuthModal = closeAuthModal; window.toggleAuthMode = toggleAuthMode; window.handleEmailAuth = handleEmailAuth; window.handleLogout = handleLogout; window.toggleProfileDropdown = toggleProfileDropdown; window.openAccountModal = openAccountModal; window.closeAccountModal = closeAccountModal; window.saveUserProfile = saveUserProfile;
