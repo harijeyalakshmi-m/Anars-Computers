@@ -1,7 +1,3 @@
-/* =====================================================
-   ANARS COMPUTERS - MERGED SINGLE PAGE APP & ADMIN ENGINE
-===================================================== */
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
@@ -18,7 +14,7 @@ let isRegisterMode = false;
 let isForgotPasswordMode = false;
 let products = [];
 let cachedProducts = [];
-let storeBrands = ["ASUS", "HP", "LENOVO", "DELL", "KINGSTON", "CORSAIR", "SAMSUNG", "HIKVISION"];
+let storeBrands = ["ASUS", "HP", "LENOVO", "DELL",  "SAMSUNG"];
 let storeCategories = ["Laptops", "Computers", "RAM", "Storage", "Motherboard", "CCTV", "Bluetooth"];
 
 let brandLogos = [];
@@ -136,7 +132,7 @@ onAuthStateChanged(auth, async (user) => {
                 </button>
                 <div id="profileDropdownMenu" class="profile-dropdown-menu">
                     <button onclick="openAccountModal()">My Profile</button>
-                    ${isAdmin ? `<button onclick="showPage('admin')" style="color:#16a34a; font-weight:800;">⚙ Admin Dashboard</button>` : ''}
+                    ${isAdmin ? `<button onclick="showPage('admin')" style="color:#16a34a; font-weight:800;">⚙️ Admin Dashboard</button>` : ''}
                     <button onclick="handleLogout()" style="color:#dc2626;">Logout</button>
                 </div>
             `;
@@ -335,7 +331,8 @@ function renderCategoriesGrid() {
     const stockImages = { "Laptops": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=700&q=80", "Computers": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=700&q=80", "RAM": "https://images.unsplash.com/photo-1592664474505-51c549ad15c5?auto=format&fit=crop&w=700&q=80", "Storage": "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=700&q=80", "Motherboard": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=700&q=80", "CCTV": "https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=700&q=80", "Bluetooth": "https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&w=700&q=80" };
     catContainer.innerHTML = storeCategories.map(cat => {
         const img = stockImages[cat] || "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80";
-        return `<button onclick="filterCategory('${cat}')" class="category-card"><div class="category-image"><img src="${img}" alt="${cat}" loading="lazy" width="200" height="150"></div><div><h3>${cat}</h3><p>Verified Stock</p></div></button>`;
+        const isActive = currentCategory.toLowerCase() === cat.toLowerCase();
+        return `<button onclick="filterCategory('${cat}')" class="category-card ${isActive ? 'active-cat-card' : ''}"><div class="category-image"><img src="${img}" alt="${cat}" loading="lazy" width="200" height="150"></div><div><h3>${cat}</h3><p>Verified Stock</p></div></button>`;
     }).join("");
 }
 
@@ -366,7 +363,7 @@ function renderProducts() {
     if (!grid) return;
 
     let filtered = products.filter(product => {
-        const categoryMatch = currentCategory === "All" || product.category === currentCategory;
+        const categoryMatch = currentCategory === "All" || product.category.toLowerCase() === currentCategory.toLowerCase();
         const brandMatch = currentBrand === "All" || product.brand.toLowerCase() === currentBrand.toLowerCase();
         const searchText = currentSearch.toLowerCase();
         const searchMatch = searchText === "" || product.name.toLowerCase().includes(searchText) || product.brand.toLowerCase().includes(searchText) || product.category.toLowerCase().includes(searchText);
@@ -374,6 +371,8 @@ function renderProducts() {
     });
 
     if (heading) heading.textContent = currentCategory === "All" ? "All Products" : currentCategory;
+    renderCategoriesGrid();
+
     if (filtered.length === 0) { grid.innerHTML = ""; if (noProducts) noProducts.style.display = "block"; return; }
     if (noProducts) noProducts.style.display = "none";
 
