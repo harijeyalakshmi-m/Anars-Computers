@@ -11,7 +11,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-const ADMIN_EMAIL = "marijeyalakshmi@gmail.com"; 
+const ADMIN_EMAIL = "mharijeyalakshmi@gmail.com"; 
 
 let currentUser = null;
 let isRegisterMode = false;
