@@ -90,11 +90,9 @@
                 </div>
             </section>
 
-            <!-- SEAMLESS BRAND LOGOS CAROUSEL -->
+            <!-- SEAMLESS BRAND LOGOS -->
             <section id="brandsLogoSection" class="brand-logos-section reveal" style="display: none;">
-                <div class="container brand-track-wrapper">
-                    <div id="brandLogosTrack" class="brand-track"></div>
-                </div>
+                <div class="container brand-track-wrapper"><div id="brandLogosTrack" class="brand-track"></div></div>
             </section>
 
             <!-- SEARCH BAR -->
@@ -182,10 +180,10 @@
                 <button class="back-btn" onclick="showPage('home')">← Back to Storefront</button>
                 <div class="cart-page-header"><h2>Store Management Dashboard</h2></div>
                 
-                <div class="stats-grid" style="margin-top: 20px;">
-                    <div class="stat-card"><h4>Active Orders</h4><div class="stat-value" id="statActiveOrders">0</div></div>
-                    <div class="stat-card"><h4>Total Store Products</h4><div class="stat-value" id="statTotalProducts">0</div></div>
-                    <div class="stat-card"><h4>Store Location</h4><div class="stat-value" style="font-size: 16px; font-weight: 700; color: #2563eb; margin-top: 6px;">Kuthukalvalasai</div></div>
+                <div class="stats-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; margin-top: 20px; margin-bottom: 30px;">
+                    <div class="stat-card" style="background:white; padding:24px; border-radius:12px; border:1px solid #e2e8f0;"><h4>Active Orders</h4><div class="stat-value" id="statActiveOrders" style="font-size:28px; font-weight:800;">0</div></div>
+                    <div class="stat-card" style="background:white; padding:24px; border-radius:12px; border:1px solid #e2e8f0;"><h4>Total Store Products</h4><div class="stat-value" id="statTotalProducts" style="font-size:28px; font-weight:800;">0</div></div>
+                    <div class="stat-card" style="background:white; padding:24px; border-radius:12px; border:1px solid #e2e8f0;"><h4>Store Location</h4><div class="stat-value" style="font-size: 16px; font-weight: 700; color: #2563eb; margin-top: 6px;">Kuthukalvalasai</div></div>
                 </div>
 
                 <div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
@@ -267,7 +265,7 @@
         </div>
     </main>
 
-    <!-- FULL-SCREEN AUTH MODAL -->
+    <!-- FULL-SCREEN AUTH MODAL (WITH FORGOT PASSWORD) -->
     <div id="authModal" class="fs-overlay">
         <div class="fs-auth-container">
             <div class="fs-auth-left">
@@ -280,13 +278,17 @@
                 <button onclick="closeAuthModal()" class="fs-close-btn" aria-label="Close Modal">✕</button>
                 <div class="fs-form-box">
                     <h3 id="authModalTitle" style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Customer Login</h3>
+                    <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;" id="authSubtitle">Please enter your details to continue.</p>
+                    
                     <form id="authForm" onsubmit="handleEmailAuth(event)" class="fs-auth-form">
                         <div class="fs-input-group"><label>Email Address</label><input type="email" id="authEmail" placeholder="name@example.com" required></div>
-                        <div class="fs-input-group"><label>Password</label><input type="password" id="authPassword" placeholder="Min 6 characters" required></div>
+                        <div class="fs-input-group" id="passwordInputGroup"><label>Password</label><input type="password" id="authPassword" placeholder="Min 6 characters"></div>
                         <button type="submit" id="authSubmitBtn" class="primary-btn" style="width:100%; padding:16px; font-size:16px; margin-top:10px;">Login to Store</button>
                     </form>
-                    <div style="text-align: center; margin-top: 24px; font-size: 14px; color: #64748b;">
-                        <span id="authSwitchText">Don't have an account?</span> <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #2563eb; font-weight: 800; text-decoration: none; margin-left: 6px;">Register here</a>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 13px;">
+                        <a href="javascript:void(0)" id="forgotPasswordLink" onclick="toggleForgotPasswordMode()" style="color: #64748b; font-weight: 600;">Forgot Password?</a>
+                        <a href="javascript:void(0)" onclick="toggleAuthMode()" id="authSwitchLink" style="color: #2563eb; font-weight: 800;">Register here</a>
                     </div>
                 </div>
             </div>
