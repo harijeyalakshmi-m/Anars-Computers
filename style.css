@@ -1,6 +1,3 @@
-/* =====================================================
-   ANARS COMPUTERS - ULTRA MODERN UI STYLING & RESPONSIVE
-===================================================== */
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap");
 
 * {
@@ -656,4 +653,3 @@ a {
   .fk-search-box { width: 100%; }
   .full-detail-card, .fk-cart-layout { grid-template-columns: 1fr; }
 }
-1
