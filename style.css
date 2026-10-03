@@ -1,3 +1,6 @@
+/* =====================================================
+    ANARS COMPUTERS - ULTRA MODERN UI STYLING & RESPONSIVE
+===================================================== */
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap");
 
 * {
@@ -1630,17 +1633,105 @@ a {
   margin-top: 12px;
 }
 
+/* =====================================================
+   PROFESSIONAL FOOTER STYLING
+===================================================== */
 .footer {
   background: #0f172a;
   color: #94a3b8;
   padding-top: 60px;
   width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: "Inter", sans-serif;
 }
+
 .footer-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: 40px;
-  padding-bottom: 50px;
+  padding-bottom: 40px;
+}
+
+.footer-col h4 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.footer-logo {
+  font-size: 22px;
+  font-weight: 800;
+  color: #38bdf8;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+  display: inline-block;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.footer-desc {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #94a3b8;
+  margin-bottom: 18px;
+}
+
+.footer-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #cbd5e1;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.footer-col a {
+  display: block;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.footer-col a:hover {
+  color: #38bdf8;
+  transform: translateX(4px);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 22px 0;
+  background: #090d16;
+}
+
+.footer-bottom-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.footer-bottom-links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-bottom-links a {
+  color: #64748b;
+  transition: color 0.2s ease;
+}
+
+.footer-bottom-links a:hover {
+  color: #38bdf8;
 }
 
 /* RESPONSIVE MEDIA QUERIES */
@@ -1693,6 +1784,18 @@ a {
   }
   .fs-form-box {
     padding: 24px;
+  }
+  .footer-grid {
+    grid-template-columns: 100%;
+    gap: 30px;
+  }
+  .footer-bottom-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  .footer-bottom-links {
+    justify-content: center;
   }
 }
 
