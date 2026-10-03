@@ -49,7 +49,9 @@ onAuthStateChanged(auth, async (user) => {
     const authBtnContainer = document.getElementById("authButtonContainer");
 
     if (user) {
-        const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+        const userEmail = user.email ? user.email.trim().toLowerCase() : "";
+        const isAdmin = userEmail === ADMIN_EMAIL.toLowerCase();
+        
         const userDocRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userDocRef);
         
@@ -195,8 +197,8 @@ function renderBrandLogosFrontEnd() {
     let html = sortedLogos.map(l => `<div class="brand-logo-item" title="${l.name}"><img src="${l.url}" alt="${l.name}" width="120" height="40" loading="lazy"></div>`).join("");
     
     if (isMarqueeEnabled) { 
-        trackWrapper.innerHTML = `<div class="brand-track brand-track-inner">${html}${html}</div>`; 
-        trackWrapper.className = "brand-track-wrapper brand-track marquee-active"; 
+        trackWrapper.innerHTML = `<div class="brand-track-inner">${html}${html}</div>`; 
+        trackWrapper.className = "brand-track marquee-active"; 
     } else { 
         trackWrapper.innerHTML = `<div class="brand-track static">${html}</div>`; 
     }
@@ -233,7 +235,8 @@ window.showPage = function(pageId) {
     if ((pageId === 'cart' || pageId === 'wishlist' || pageId === 'orders') && !currentUser) {
         alert("🔒 Please login to access your cart, wishlist & orders!"); return openAuthModal();
     }
-    if (pageId === 'admin' && (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase())) {
+    const userEmail = currentUser && currentUser.email ? currentUser.email.trim().toLowerCase() : "";
+    if (pageId === 'admin' && userEmail !== ADMIN_EMAIL.toLowerCase()) {
         alert("Access denied! Admins only."); return;
     }
     document.querySelectorAll(".page-view").forEach(page => page.classList.remove("active"));
