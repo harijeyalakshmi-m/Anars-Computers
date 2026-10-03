@@ -2,218 +2,348 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anars Computers - Kuthukalvalasai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Anars Computers | Kuthukalvalasai IT Store</title>
+    <meta name="description" content="Anars Computers in Kuthukalvalasai - Buy Laptops, Desktops, RAM, SSDs, and CCTV Cameras at the best price.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body data-theme="light">
+<body data-theme="modern">
 
-    <!-- TOP HEADER -->
-    <header class="fk-header">
-        <div class="fk-header-container">
-            <div class="fk-logo-box" onclick="showPage('home')" style="cursor:pointer;">
-                <h1>ANARS COMPUTERS</h1>
-                <span>Annai Complex, Kuthukalvalasai</span>
-            </div>
-            
-            <div class="fk-search-box">
-                <input type="text" id="searchInput" placeholder="Search for Laptops, RAM, SSD, CCTV & more..." oninput="searchProducts()">
-                <button aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
+    <!-- MARQUEE ANNOUNCEMENT BAR -->
+    <div class="marquee-bar">
+        <div class="container">
+            <marquee behavior="scroll" direction="left" scrollamount="5">
+                Welcome to Anars Computers, Annai Complex, Kuthukalvalasai! &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+                Best deals on Laptops, Custom Gaming Rigs, RAM, SSD, and CCTV Cameras! &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+                Call Us: 091503 03600 for instant technical support!
+            </marquee>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container header-inner">
+            <div style="display:flex; align-items:center; gap:14px;">
+                <button class="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Open Mobile Menu">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+                <a href="#home" class="logo" onclick="showPage('home')" aria-label="Anars Computers Home">
+                    <span class="logo-main">ANARS</span>
+                    <span class="logo-sub">COMPUTERS</span>
+                </a>
             </div>
 
-            <div class="fk-nav-actions">
-                <button class="fk-nav-btn" onclick="showPage('wishlist')" aria-label="Wishlist">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                    <span>Wishlist</span>
-                    <span class="fk-badge" id="wishlistCount">0</span>
-                </button>
-                <button class="fk-nav-btn" onclick="showPage('cart')" aria-label="Cart">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                    <span>Cart</span>
-                    <span class="fk-badge" id="cartCount">0</span>
-                </button>
-                <button class="fk-nav-btn" onclick="showPage('orders')" aria-label="Orders">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    <span>My Orders</span>
-                    <span class="fk-badge" id="ordersCount">0</span>
-                </button>
-                
-                <!-- AUTH BUTTON CONTAINER -->
-                <div id="authButtonContainer" style="position:relative;"></div>
+            <nav class="main-nav">
+                <a href="#home" onclick="showPage('home')">Home</a>
+                <a href="#products" onclick="scrollToProducts()">Products</a>
+                <a href="#categories" onclick="scrollToCategories()">Categories</a>
+                <a href="#orders" onclick="showPage('orders')">My Orders</a>
+                <a href="#about" onclick="scrollToAbout()">About</a>
+                <a href="#contact" onclick="scrollToContact()">Contact</a>
+            </nav>
+
+            <div class="header-actions">
+                <div class="desktop-only-actions">
+                    <button class="header-btn" onclick="focusSearch()" aria-label="Search">Search</button>
+                    <button class="header-btn" onclick="showPage('orders')">Orders <span id="ordersCount" class="badge">0</span></button>
+                    <button class="header-btn" onclick="showPage('wishlist')">Wishlist <span id="wishlistCount" class="badge">0</span></button>
+                    <button class="header-btn" onclick="showPage('cart')">Cart <span id="cartCount" class="badge">0</span></button>
+                </div>
+                <div id="authButtonContainer" class="profile-dropdown-wrapper"></div>
             </div>
         </div>
     </header>
 
-    <!-- ================= MAIN HOME PAGE ================= -->
-    <main id="homePage" class="page-view active">
-        <!-- HERO SLIDER -->
-        <section class="hero-section">
-            <div class="hero-slider">
-                <div class="hero-slide active" style="background: linear-gradient(135deg, #1e3a8a, #2563eb);">
-                    <div class="hero-content">
-                        <h2>High-Performance Laptops & PCs</h2>
-                        <p>Authorized sales & service in Kuthukalvalasai. Best price guaranteed!</p>
-                        <button class="primary-btn" onclick="scrollToProducts()">Explore Store</button>
+    <main>
+        <!-- HOME PAGE -->
+        <div id="homePage" class="page-view active">
+            <section class="hero reveal-zoom">
+                <div class="hero-slider">
+                    <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=1800&q=80')">
+                        <div class="hero-overlay"></div>
+                        <div class="container hero-content">
+                            <span class="hero-tag">KUTHUKALVALASAI'S PREMIER IT STORE</span>
+                            <h1>Build Your<br>Ultimate Gaming Rig</h1>
+                            <p>High-performance Laptops, Custom Desktop PCs, Components, and Expert IT Solutions right at your doorstep.</p>
+                            <button class="primary-btn" onclick="scrollToProducts()">Explore Products</button>
+                        </div>
+                    </div>
+                    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1800&q=80')">
+                        <div class="hero-overlay"></div>
+                        <div class="container hero-content">
+                            <span class="hero-tag">LAPTOPS & WORKSTATIONS</span>
+                            <h1>Power Your<br>Workflow</h1>
+                            <p>Top brand laptops from ASUS, HP, Lenovo, and Dell with official warranty.</p>
+                            <button class="primary-btn" onclick="filterCategory('Laptops')">Shop Laptops</button>
+                        </div>
+                    </div>
+                    <button class="slider-btn slider-prev" onclick="changeSlide(-1)" aria-label="Previous Slide">&#10094;</button>
+                    <button class="slider-btn slider-next" onclick="changeSlide(1)" aria-label="Next Slide">&#10095;</button>
+                    <div class="slider-dots">
+                        <button onclick="goToSlide(0)" class="dot active" aria-label="Slide 1"></button>
+                        <button onclick="goToSlide(1)" class="dot" aria-label="Slide 2"></button>
                     </div>
                 </div>
-                <div class="hero-slide" style="background: linear-gradient(135deg, #0f172a, #334155);">
-                    <div class="hero-content">
-                        <h2>CCTV Security & Surveillance</h2>
-                        <p>Protect your home and office with crystal clear HD cameras.</p>
-                        <button class="primary-btn" onclick="filterCategory('CCTV')">View CCTV Stock</button>
+            </section>
+
+            <section id="brandsLogoSection" class="brand-logos-section reveal" style="display: none;">
+                <div class="container brand-track-wrapper" id="brandLogosTrack"></div>
+            </section>
+
+            <section class="search-section reveal">
+                <div class="container">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search laptops, computers, RAM, brands, CCTV..." oninput="searchProducts()" aria-label="Search Products">
+                        <button onclick="searchProducts()" aria-label="Search Button">Search</button>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- BRANDS LOGO MARQUEE -->
-        <section class="brands-logo-section" id="brandsLogoSection">
-            <div class="container">
-                <h3>Authorized Brands & Partners</h3>
-                <div class="brand-track-wrapper" id="brandLogosTrack"></div>
-            </div>
-        </section>
+            <section id="categories" class="categories-section reveal">
+                <div class="container">
+                    <div class="section-heading"><p>SHOP BY CATEGORY</p><h2>Everything Your Setup Needs</h2></div>
+                    <div id="categoryGridContainer" class="category-grid"></div>
+                </div>
+            </section>
 
-        <!-- CATEGORIES GRID -->
-        <section class="categories-section" id="categories">
-            <div class="container">
-                <h2>Browse by Category</h2>
-                <div class="category-grid" id="categoryGridContainer"></div>
-            </div>
-        </section>
+            <section id="products" class="products-section reveal">
+                <div class="container">
+                    <div class="products-top">
+                        <div><p class="section-small">FEATURED CATALOG</p><h2 id="productHeading">All Products</h2></div>
+                        <button class="clear-filter" onclick="showAllProducts()">View All Products</button>
+                    </div>
+                    <div id="brandFilters" class="brand-filters"></div>
+                    <div id="productGrid" class="product-grid"></div>
+                    <div id="noProducts" class="no-products">
+                        <h3>No products found</h3>
+                        <p>Try searching another keyword or brand.</p>
+                        <button onclick="showAllProducts()" class="primary-btn">View All</button>
+                    </div>
+                </div>
+            </section>
 
-        <!-- PRODUCTS SECTION -->
-        <section class="products-section container" id="products">
-            <div class="section-header">
-                <h2 id="productHeading">All Products</h2>
-                <div class="brand-filters" id="brandFilters"></div>
+            <section class="store-info-banner reveal">
+                <div class="container store-banner-grid">
+                    <div class="store-banner-card"><span class="banner-tag">OFFICIAL STORE LOCATION</span><h3>Annai Complex, Kuthukalvalasai</h3><p>Tamil Nadu 627803</p></div>
+                    <div class="store-banner-card"><span class="banner-tag">CUSTOMER RATING</span><h3>5.0 Star Rating</h3><p>Trusted Computer Store & IT Solutions</p></div>
+                    <div class="store-banner-card"><span class="banner-tag">DIRECT HELP LINE</span><h3>091503 03600</h3><p>Open Today · Closes 9:30 PM</p></div>
+                </div>
+            </section>
+
+            <section id="about" class="about-section reveal">
+                <div class="container about-grid">
+                    <div class="about-image-wrapper">
+                        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=80" alt="Anars Store" width="500" height="420" loading="lazy">
+                        <div class="about-badge-floating"><strong>5.0 Star</strong><span>Top Rated Local Store</span></div>
+                    </div>
+                    <div class="about-content">
+                        <p class="section-small">ABOUT ANARS COMPUTERS</p>
+                        <h2>Technology That Works For You</h2>
+                        <p class="about-lead">Located right at Annai Complex, Kuthukalvalasai, Tamil Nadu 627803, Anars Computers is your trusted local destination for computer hardware, laptops, and IT solutions.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contact" class="contact-section reveal">
+                <div class="container">
+                    <div class="section-heading text-center"><p>GET IN TOUCH</p><h2>Visit Our Store in Kuthukalvalasai</h2></div>
+                    <div class="contact-grid" style="margin-bottom: 30px;">
+                        <div class="contact-card"><h3>Visit Store</h3><p><strong>Anars Computers</strong></p><p>Annai Complex, Kuthukalvalasai, TN 627803</p></div>
+                        <div class="contact-card"><h3>Call Store</h3><p><strong>Phone:</strong> <a href="tel:09150303600" style="color:#2563eb; font-weight:600;">091503 03600</a></p></div>
+                        <div class="contact-card"><h3>Google Maps Navigation</h3><a href="https://www.google.com/maps/search/?api=1&query=Annai+Complex+Kuthukalvalasai+Tamil+Nadu+627803" target="_blank" rel="noopener noreferrer" class="primary-btn" style="margin-top: 10px; display:inline-block; font-size:12px; padding: 8px 16px;">Open in Google Maps →</a></div>
+                    </div>
+                    <div style="border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; height: 350px;">
+                        <iframe title="Store Location Google Map" width="100%" height="100%" frameborder="0" scrolling="no" src="https://maps.google.com/maps?q=Kuthukalvalasai+Tamil+Nadu+627803&t=&z=14&ie=UTF8&iwloc=&output=embed" loading="lazy"></iframe>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- OTHER PAGES -->
+        <div id="detailPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">← Back to Store</button><div id="productDetailContainer"></div></div></div>
+        <div id="cartPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">← Continue Shopping</button><div class="cart-page-header"><h2>Shopping Cart</h2></div><div id="cartPageContent"></div></div></div>
+        <div id="wishlistPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">← Continue Shopping</button><div class="cart-page-header"><h2>My Saved Wishlist</h2></div><div id="wishlistPageContent"></div></div></div>
+        <div id="checkoutPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('cart')">← Back to Cart</button><div class="cart-page-header"><h2>Shipping & Checkout Details</h2></div><div class="checkout-layout"><form class="checkout-form-box" onsubmit="submitOrder(event)"><h3>Shipping Address</h3><div class="form-group"><label>Full Name</label><input type="text" id="shipName" required></div><div class="form-group"><label>Phone Number</label><input type="tel" id="shipPhone" required></div><div class="form-group"><label>Street Address / Door No</label><input type="text" id="shipAddress" required></div><button type="submit" class="fk-place-order-btn" style="margin-top:20px;">COMPLETE ORDER</button></form><div class="fk-price-sidebar" id="checkoutSummarySidebar"></div></div></div></div>
+        <div id="successPage" class="page-view"><div class="container reveal" style="padding: 80px 0; text-align: center;"><div class="success-card"><div class="success-icon">✓</div><h2>Order Placed Successfully!</h2><p>Your Order ID is <span id="confirmedOrderId" style="font-weight:700; color:#2563eb;"></span></p><button class="primary-btn" onclick="showPage('home')" style="margin:20px auto 0;">Return to Store</button></div></div></div>
+        <div id="ordersPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">← Back to Store</button><div class="cart-page-header"><h2>My Orders & Invoices</h2></div><div id="myOrdersListContainer"></div></div></div>
+
+        <!-- 🌟 MERGED ADMIN DASHBOARD VIEW INSIDE MAIN WEBSITE 🌟 -->
+        <div id="adminPage" class="page-view">
+            <div class="container" style="padding: 40px 0;">
+                <button class="back-btn" onclick="showPage('home')">← Back to Storefront</button>
+                <div class="cart-page-header"><h2>Store Management Dashboard</h2></div>
+                
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div class="stat-card"><h4>Active Orders</h4><div class="stat-value" id="statActiveOrders">0</div></div>
+                    <div class="stat-card"><h4>Total Store Products</h4><div class="stat-value" id="statTotalProducts">0</div></div>
+                    <div class="stat-card"><h4>Store Location</h4><div class="stat-value" style="font-size: 16px; font-weight: 700; color: #2563eb; margin-top: 6px;">Kuthukalvalasai</div></div>
+                </div>
+
+                <!-- Admin Tabs Control -->
+                <div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
+                    <button id="btnTabOrders" class="primary-btn" style="padding: 10px 20px;" onclick="switchAdminTab('orders')">Live Orders</button>
+                    <button id="btnTabProducts" class="primary-btn" style="background:#334155; padding: 10px 20px;" onclick="switchAdminTab('products')">Manage Products</button>
+                    <button id="btnTabMeta" class="primary-btn" style="background:#334155; padding: 10px 20px;" onclick="switchAdminTab('meta')">Settings & Logos</button>
+                </div>
+
+                <!-- TAB 1: ORDERS -->
+                <div id="adminTabOrders" class="admin-tab-section">
+                    <div class="admin-card">
+                        <h2><span>Live Customer Orders Control</span><span style="font-size: 12px; font-weight: 600; color: #64748b;" id="orderCountBadge">0 Orders</span></h2>
+                        <div style="overflow-x: auto;">
+                            <table class="admin-table">
+                                <thead><tr><th>Order ID & Date</th><th>Customer Info</th><th>Shipping Address</th><th>Items Ordered</th><th>Live Status Control</th></tr></thead>
+                                <tbody id="adminOrdersTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: PRODUCTS -->
+                <div id="adminTabProducts" class="admin-tab-section" style="display:none;">
+                    <div class="admin-card">
+                        <h2 id="formHeading">Add New Product to Firebase Database</h2>
+                        <form id="productForm">
+                            <input type="hidden" id="editProductId">
+                            <div class="admin-form-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                                <div class="form-group"><label>Product Name</label><input type="text" id="admName" placeholder="e.g. ASUS TUF Gaming" required></div>
+                                <div class="form-group"><label>Brand</label><select id="admBrandSelect" required><option value="">Select Brand</option></select></div>
+                                <div class="form-group"><label>Category</label><select id="admCategorySelect" required><option value="">Select Category</option></select></div>
+                                <div class="form-group"><label>Selling Price (₹)</label><input type="number" id="admPrice" placeholder="64999" required></div>
+                                <div class="form-group"><label>Original MRP (₹)</label><input type="number" id="admOrigPrice" placeholder="84999" required></div>
+                                <div class="form-group"><label>Image URL</label><input type="text" id="admImage" placeholder="https://..." required></div>
+                                <div class="form-group" style="grid-column:span 2;"><label>Description & Specifications</label><input type="text" id="admDesc" placeholder="Detailed highlights" required></div>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button type="submit" class="primary-btn" id="submitProductBtn">Upload to Live Store</button>
+                                <button type="button" id="cancelEditBtn" class="primary-btn" style="background:#64748b; display:none;" onclick="resetProductForm()">Cancel Edit</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="admin-card">
+                        <h2>Existing Products Inventory</h2>
+                        <table class="admin-table">
+                            <thead><tr><th>Product Name</th><th>Brand / Category</th><th>Price</th><th>Actions</th></tr></thead>
+                            <tbody id="adminProductsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 3: SETTINGS & LOGOS -->
+                <div id="adminTabMeta" class="admin-tab-section" style="display:none;">
+                    <div class="admin-card" style="border: 2px solid #2563eb;">
+                        <h2>Live Site UI Layout Toggle</h2>
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Switch between horizontal lists (Flipkart style) or standard cards (Classic style).</p>
+                        <div style="display: flex; gap: 20px;">
+                            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px;"><input type="radio" name="uiThemeToggle" value="modern" onchange="updateUITheme(this.value)"> Modern E-commerce List (Flipkart Style)</label>
+                            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px;"><input type="radio" name="uiThemeToggle" value="classic" onchange="updateUITheme(this.value)"> Classic Grid (Box Style)</label>
+                        </div>
+                    </div>
+                    <div class="admin-card">
+                        <h2>Store Frontend Brand Logos Carousel</h2>
+                        <div style="margin-bottom: 20px;"><label style="display:flex; align-items:center; gap:10px; font-weight:700; font-size:14px; cursor:pointer;"><input type="checkbox" id="admMarqueeToggle" onchange="toggleMarquee()"> Enable Marquee Animation (Auto-Scroll)</label></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px; align-items:end;">
+                            <div class="form-group" style="margin-bottom:0;"><label>Brand Name</label><input type="text" id="logoName" placeholder="Asus"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label>Logo URL</label><input type="text" id="logoUrl" placeholder="https://..."></div>
+                            <div class="form-group" style="margin-bottom:0;"><label>Position</label><input type="number" id="logoPos" value="1"></div>
+                            <button class="primary-btn" style="padding:12px;" onclick="addBrandLogo()">+ Add Logo</button>
+                        </div>
+                        <table class="admin-table" style="margin-top: 20px;">
+                            <thead><tr><th>Pos</th><th>Image</th><th>Name</th><th>Action</th></tr></thead>
+                            <tbody id="adminBrandLogosTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
-            <div class="product-grid" id="productGrid"></div>
-            <div id="noProducts" class="no-products" style="display:none;">
-                <h3>No products found matching your search.</h3>
-                <button class="primary-btn" onclick="showAllProducts()">Show All Products</button>
-            </div>
-        </section>
+        </div>
     </main>
 
-    <!-- ================= PRODUCT DETAIL PAGE ================= -->
-    <div id="detailPage" class="page-view container" style="padding-top:40px;">
-        <button class="secondary-btn" onclick="showPage('home')" style="margin-bottom:20px;">← Back to Store</button>
-        <div id="productDetailContainer"></div>
-    </div>
-
-    <!-- ================= CART PAGE ================= -->
-    <div id="cartPage" class="page-view container" style="padding-top:40px;">
-        <h2 style="margin-bottom:20px; font-weight:800; color:#0f172a;">My Shopping Cart</h2>
-        <div id="cartPageContent"></div>
-    </div>
-
-    <!-- ================= WISHLIST PAGE ================= -->
-    <div id="wishlistPage" class="page-view container" style="padding-top:40px;">
-        <h2 style="margin-bottom:20px; font-weight:800; color:#0f172a;">My Wishlist</h2>
-        <div id="wishlistPageContent"></div>
-    </div>
-
-    <!-- ================= CHECKOUT PAGE ================= -->
-    <div id="checkoutPage" class="page-view container" style="padding-top:40px; max-width:800px;">
-        <h2 style="margin-bottom:20px; font-weight:800; color:#0f172a;">Delivery Details & Checkout</h2>
-        <form onsubmit="submitOrder(event)" class="admin-card" style="background:white; padding:30px; border-radius:16px; border:1px solid #e2e8f0; display:flex; flex-direction:column; gap:16px;">
-            <div class="fs-profile-group"><label>Full Name</label><input type="text" id="shipName" placeholder="Enter recipient name" required style="padding:12px; border:1px solid #cbd5e1; border-radius:8px;"></div>
-            <div class="fs-profile-group"><label>Mobile Number</label><input type="tel" id="shipPhone" placeholder="10-digit mobile number" required style="padding:12px; border:1px solid #cbd5e1; border-radius:8px;"></div>
-            <div class="fs-profile-group"><label>Delivery Address (Kuthukalvalasai / Surrounding areas)</label><textarea id="shipAddress" placeholder="Door No, Street Name, Landmark" rows="3" required style="padding:12px; border:1px solid #cbd5e1; border-radius:8px; font-family:inherit;"></textarea></div>
-            <div id="checkoutSummarySidebar" style="background:#f8fafc; padding:16px; border-radius:8px; border:1px solid #e2e8f0;"></div>
-            <button type="submit" class="primary-btn" style="padding:14px; font-weight:800; font-size:15px;">CONFIRM & PLACE ORDER (COD)</button>
-        </form>
-    </div>
-
-    <!-- ================= SUCCESS PAGE ================= -->
-    <div id="successPage" class="page-view container" style="padding-top:60px; text-align:center;">
-        <div style="max-width:500px; margin:auto; background:white; padding:40px; border-radius:16px; border:1px solid #e2e8f0;">
-            <div style="font-size:50px; color:#16a34a; margin-bottom:15px;">✓</div>
-            <h2 style="font-size:24px; font-weight:800; color:#0f172a;">Order Placed Successfully!</h2>
-            <p style="color:#64748b; margin-top:10px; font-size:14px;">Your Order ID is <strong id="confirmedOrderId" style="color:#2563eb;"></strong>. We will process and deliver your items soon.</p>
-            <button class="primary-btn" style="margin-top:25px;" onclick="showPage('orders')">View My Orders</button>
-        </div>
-    </div>
-
-    <!-- ================= MY ORDERS PAGE ================= -->
-    <div id="ordersPage" class="page-view container" style="padding-top:40px;">
-        <h2 style="margin-bottom:20px; font-weight:800; color:#0f172a;">My Orders Tracking</h2>
-        <div id="myOrdersListContainer"></div>
-    </div>
-
-    <!-- ================= ADMIN DASHBOARD PAGE (MERGED IN-FILE) ================= -->
-    <div id="adminPage" class="page-view container" style="padding-top:40px; padding-bottom:60px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-            <div>
-                <h2 style="font-size:24px; font-weight:900; color:#0f172a;">⚙️ Admin Control Center</h2>
-                <p style="font-size:13px; color:#64748b;">Manage store products, live customer orders & inventory</p>
+    <!-- FULL-SCREEN AUTH MODAL -->
+    <div id="authModal" class="fs-overlay">
+        <div class="fs-auth-container">
+            <div class="fs-auth-left">
+                <div style="position: relative; z-index: 2;">
+                    <span style="font-size: 14px; font-weight: 800; letter-spacing: 3px; color: #38bdf8; text-transform: uppercase;">Anars Computers</span>
+                    <h1 style="font-size: 48px; font-weight: 800; line-height: 1.1; margin: 20px 0;">Your Ultimate<br>Tech Destination.</h1>
+                </div>
             </div>
-            <button class="secondary-btn" onclick="showPage('home')" style="font-weight:700;">← Back to Store Front</button>
-        </div>
-
-        <!-- Admin Navigation Tabs -->
-        <div style="display:flex; gap:12px; margin-bottom:25px; border-bottom:2px solid #e2e8f0; padding-bottom:12px;">
-            <button onclick="switchAdminTab('products')" id="adminTabProdBtn" class="primary-btn" style="padding:10px 20px;">Manage Products</button>
-            <button onclick="switchAdminTab('orders')" id="adminTabOrdersBtn" class="secondary-btn" style="padding:10px 20px;">Customer Orders</button>
-        </div>
-
-        <!-- Tab 1: Products Management -->
-        <div id="adminProductsSection">
-            <div class="admin-card" style="background:white; padding:25px; border-radius:16px; border:1px solid #e2e8f0; margin-bottom:30px;">
-                <h3 style="font-size:18px; font-weight:800; margin-bottom:15px; color:#0f172a;">Add New Product</h3>
-                <form onsubmit="handleAddNewProduct(event)" style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                    <input type="text" id="adminProdName" placeholder="Product Name" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
-                    <input type="text" id="adminProdBrand" placeholder="Brand (e.g. ASUS, HP)" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
-                    <select id="adminProdCategory" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-weight:600;">
-                        <option value="Laptops">Laptops</option><option value="Computers">Computers</option><option value="RAM">RAM</option><option value="Storage">Storage</option><option value="Motherboard">Motherboard</option><option value="CCTV">CCTV</option><option value="Bluetooth">Bluetooth</option>
-                    </select>
-                    <input type="number" id="adminProdPrice" placeholder="Selling Price (₹)" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
-                    <input type="number" id="adminProdOriginalPrice" placeholder="Original MRP (₹)" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
-                    <input type="url" id="adminProdImage" placeholder="Image URL (Unsplash / Direct Link)" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
-                    <textarea id="adminProdDesc" placeholder="Product Description & Specifications" rows="2" required style="grid-column:span 2; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-family:inherit;"></textarea>
-                    <button type="submit" class="primary-btn" style="grid-column:span 2; padding:12px; font-weight:800;">Upload Product to Store</button>
-                </form>
+            <div class="fs-auth-right">
+                <button onclick="closeAuthModal()" class="fs-close-btn" aria-label="Close Modal">✕</button>
+                <div class="fs-form-box">
+                    <h3 id="authModalTitle" style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Customer Login</h3>
+                    <form id="authForm" onsubmit="handleEmailAuth(event)" class="fs-auth-form">
+                        <div class="fs-input-group"><label>Email Address</label><input type="email" id="authEmail" placeholder="name@example.com" required></div>
+                        <div class="fs-input-group"><label>Password</label><input type="password" id="authPassword" placeholder="Min 6 characters" required></div>
+                        <button type="submit" id="authSubmitBtn" class="primary-btn" style="width:100%; padding:16px; font-size:16px; margin-top:10px;">Login to Store</button>
+                    </form>
+                    <div style="text-align: center; margin-top: 24px; font-size: 14px; color: #64748b;">
+                        <span id="authSwitchText">Don't have an account?</span> <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color: #2563eb; font-weight: 800; text-decoration: none; margin-left: 6px;">Register here</a>
+                    </div>
+                </div>
             </div>
-
-            <h3 style="font-size:18px; font-weight:800; margin-bottom:15px; color:#0f172a;">Existing Store Inventory</h3>
-            <div id="adminProductListGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:20px;"></div>
-        </div>
-
-        <!-- Tab 2: Customer Orders Management -->
-        <div id="adminOrdersSection" style="display:none;">
-            <h3 style="font-size:18px; font-weight:800; margin-bottom:15px; color:#0f172a;">Live Customer Orders from Firestore</h3>
-            <div id="adminOrdersListContainer"></div>
         </div>
     </div>
 
-    <!-- ================= AUTH MODAL ================= -->
-    <div id="authModal" class="modal-overlay">
-        <div class="modal-box">
-            <button class="modal-close" onclick="closeAuthModal()">×</button>
-            <h3 id="authModalTitle" style="font-weight:800; margin-bottom:15px; color:#0f172a;">Customer Login</h3>
-            <form onsubmit="handleEmailAuth(event)" style="display:flex; flex-direction:column; gap:14px;">
-                <input type="email" id="authEmail" placeholder="Email Address" required style="padding:12px; border:1px solid #cbd5e1; border-radius:8px;">
-                <input type="password" id="authPassword" placeholder="Password" required style="padding:12px; border:1px solid #cbd5e1; border-radius:8px;">
-                <button type="submit" id="authSubmitBtn" class="primary-btn" style="padding:12px; font-weight:800;">Login to Store</button>
-            </form>
-            <p style="text-align:center; margin-top:15px; font-size:13px; color:#64748b;">
-                <span id="authSwitchText">Don't have an account?</span> 
-                <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color:#2563eb; font-weight:700;">Click here</a>
-            </p>
+    <!-- FULL-SCREEN PROFILE DASHBOARD -->
+    <div id="accountModal" class="fs-overlay">
+        <div class="fs-profile-container">
+            <button onclick="closeAccountModal()" class="fs-close-btn" style="position: fixed;" aria-label="Close Profile">✕</button>
+            <div class="fs-profile-inner">
+                <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 30px;">
+                    <h2 style="font-size: 32px; font-weight: 800; color: #0f172a;">My Profile Dashboard</h2>
+                </div>
+                <div id="accountModalContent" class="fs-profile-grid"></div>
+                <div style="display:flex; gap:16px; margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 30px;">
+                    <button class="primary-btn" onclick="saveUserProfile()" style="flex:1; background:#16a34a; padding: 16px; font-size: 15px;">Save Profile Changes</button>
+                    <button class="primary-btn" onclick="closeAccountModal()" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding: 16px 30px; font-size: 15px;">Cancel</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- ================= ACCOUNT PROFILE MODAL ================= -->
-    <div id="accountModal" class="modal-overlay">
-        <div class="modal-box">
-            <button class="modal-close" onclick="closeAccountModal()">×</button>
-            <h3 style="font-weight:800; margin-bottom:15px; color:#0f172a;">My Profile Details</h3>
-            <div id="accountModalContent"></div>
-            <button onclick="saveUserProfile()" class="primary-btn" style="width:100%; margin-top:20px; padding:12px; font-weight:800;">Save Profile Changes</button>
+    <!-- HAMBURGER SIDEBAR -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay" onclick="toggleMobileMenu()"></div>
+    <div id="mobileMenuSidebar" class="mobile-menu-sidebar">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 24px; border-bottom: 1px solid #e2e8f0;">
+            <div class="logo"><span class="logo-main" style="font-size: 20px;">ANARS</span><span class="logo-sub" style="font-size: 9px;">COMPUTERS</span></div>
+            <button onclick="toggleMobileMenu()" aria-label="Close Menu" style="background: #f1f5f9; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 14px; font-weight: bold; color: #475569;">✕</button>
+        </div>
+        <div class="mobile-menu-links">
+            <div class="mobile-sidebar-search"><input type="text" id="mobileSearchInputSidebar" placeholder="Search store..." oninput="searchProductsMobile()" aria-label="Mobile Search"></div>
+            <a href="#home" onclick="showPage('home'); toggleMobileMenu();">🏠 <span>Home</span></a>
+            <a href="#products" onclick="scrollToProducts(); toggleMobileMenu();">💻 <span>Store Products</span></a>
+            <a href="#categories" onclick="scrollToCategories(); toggleMobileMenu();">📁 <span>Top Categories</span></a>
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 10px 0;">
+            <a href="#orders" onclick="showPage('orders'); toggleMobileMenu();" class="sidebar-badge-link">📦 <span>My Orders</span><span class="sidebar-badge" id="sidebarOrdersCount">0</span></a>
+            <a href="#wishlist" onclick="showPage('wishlist'); toggleMobileMenu();" class="sidebar-badge-link">❤️ <span>Wishlist</span><span class="sidebar-badge" id="sidebarWishlistCount">0</span></a>
+            <a href="#cart" onclick="showPage('cart'); toggleMobileMenu();" class="sidebar-badge-link">🛒 <span>My Cart</span><span class="sidebar-badge" id="sidebarCartCount">0</span></a>
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 10px 0;">
+            <a href="#about" onclick="scrollToAbout(); toggleMobileMenu();">🏢 <span>About Store</span></a>
+            <a href="#contact" onclick="scrollToContact(); toggleMobileMenu();">📞 <span>Contact & Map</span></a>
         </div>
     </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <div class="mobile-bottom-nav">
+        <a href="#home" onclick="showPage('home')"><span>Home</span></a>
+        <a href="#products" onclick="scrollToProducts()"><span>Products</span></a>
+        <a href="#orders" onclick="showPage('orders')"><span>Orders</span></a>
+        <a href="#cart" onclick="showPage('cart')"><span>Cart</span></a>
+    </div>
+
+    <footer class="footer reveal">
+        <div class="container footer-grid">
+            <div><div class="footer-logo">ANARS COMPUTERS</div><p>Annai Complex, Kuthukalvalasai, TN 627803</p></div>
+            <div><h4>Categories</h4><a href="#products" onclick="showPage('home'); filterCategory('Laptops')">Laptops</a><a href="#products" onclick="showPage('home'); filterCategory('CCTV')">CCTV</a></div>
+            <div><h4>Support</h4><a href="#orders" onclick="showPage('orders')">My Orders</a><a href="#contact" onclick="scrollToContact()">Store Location</a></div>
+        </div>
+        <div class="footer-bottom"><p>© 2026 Anars Computers, Kuthukalvalasai. All Rights Reserved.</p></div>
+    </footer>
 
     <script type="module" src="script.js"></script>
 </body>
