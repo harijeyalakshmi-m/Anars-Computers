@@ -11,7 +11,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// 🌟 UPDATE: Exact Admin Email Added Here 🌟
 const ADMIN_EMAIL = "mharijeyalakshmi@gmail.com"; 
 
 let currentUser = null;
@@ -28,7 +27,7 @@ let currentBrand = "All";
 let currentSearch = "";
 let wishlist = [];
 let cart = [];
-let orders = []; // Live Synced Firebase Orders
+let orders = [];
 let productReviews = JSON.parse(localStorage.getItem("anarsProductReviews") || "{}");
 let currentSlide = 0;
 
@@ -111,8 +110,12 @@ window.toggleAuthMode = function() {
     const title = document.getElementById("authModalTitle");
     const btn = document.getElementById("authSubmitBtn");
     const switchText = document.getElementById("authSwitchText");
-    if (isRegisterMode) { title.textContent = "Create New Account"; btn.textContent = "Register Account"; switchText.textContent = "Already have an account?"; } 
-    else { title.textContent = "Customer Login"; btn.textContent = "Login to Store"; switchText.textContent = "Don't have an account?"; }
+
+    if (isRegisterMode) {
+        title.textContent = "Create New Account"; btn.textContent = "Register Account"; switchText.textContent = "Already have an account?";
+    } else {
+        title.textContent = "Customer Login"; btn.textContent = "Login to Store"; switchText.textContent = "Don't have an account?";
+    }
 };
 
 window.handleEmailAuth = async function(event) {
@@ -125,13 +128,11 @@ window.handleEmailAuth = async function(event) {
             await setDoc(doc(db, "users", res.user.uid), { email, name: "", phone: "", cart: [], wishlist: [], orders: [] });
             alert("Account registered successfully!");
             closeAuthModal();
-            // 🌟 ADMIN AUTO-REDIRECT ON SIGN UP 🌟
             if (email === ADMIN_EMAIL) { window.location.href = "admin.html"; }
         } else {
             await signInWithEmailAndPassword(auth, email, password);
             alert("Logged in successfully!");
             closeAuthModal();
-            // 🌟 ADMIN AUTO-REDIRECT ON LOGIN 🌟
             if (email === ADMIN_EMAIL) { window.location.href = "admin.html"; }
         }
     } catch (e) { console.error("Auth Error:", e); alert("Authentication failed: " + e.message); }
@@ -337,28 +338,17 @@ function renderWishlistPage() {
         const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
         return `
         <div class="fk-cart-item-card">
-            <div class="fk-cart-img-wrapper" style="border:none; padding:0; margin:0;">
-                <img src="${product.image}" alt="${product.name}" class="fk-cart-item-img" onerror="imageFallback(this)" loading="lazy" width="120" height="120">
-            </div>
+            <div class="fk-cart-img-wrapper" style="border:none; padding:0; margin:0;"><img src="${product.image}" alt="${product.name}" class="fk-cart-item-img" onerror="imageFallback(this)" loading="lazy" width="120" height="120"></div>
             <div class="fk-cart-item-details">
-                <h4 onclick="openProductDetail('${product.id}')">${product.name}</h4>
-                <div class="seller">Seller: Anars Computers • ${product.brand}</div>
-                <div class="fk-cart-price-row">
-                    <span class="fk-cart-price">₹${Number(product.price).toLocaleString("en-IN")}</span>
-                    <span class="fk-cart-mrp">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span>
-                    <span class="fk-cart-discount">${discount}% Off</span>
-                </div>
+                <h4 onclick="openProductDetail('${product.id}')">${product.name}</h4><div class="seller">Seller: Anars Computers • ${product.brand}</div>
+                <div class="fk-cart-price-row"><span class="fk-cart-price">₹${Number(product.price).toLocaleString("en-IN")}</span><span class="fk-cart-mrp">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span><span class="fk-cart-discount">${discount}% Off</span></div>
                 <div class="fk-action-links">
-                    <button onclick="removeWishlist('${product.id}')" class="fk-text-btn text-danger" style="color:#dc2626;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> REMOVE
-                    </button>
-                    <button onclick="addToCart('${product.id}'); removeWishlist('${product.id}');" class="fk-text-btn" style="color:#2563eb;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg> MOVE TO CART
-                    </button>
+                    <button onclick="removeWishlist('${product.id}')" class="fk-text-btn text-danger" style="color:#dc2626;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> REMOVE</button>
+                    <button onclick="addToCart('${product.id}'); removeWishlist('${product.id}');" class="fk-text-btn" style="color:#2563eb;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg> MOVE TO CART</button>
                 </div>
             </div>
-        </div>
-    `}).join("");
+        </div>`
+    }).join("");
 }
 
 function removeWishlist(id) { if (!currentUser) return; wishlist = wishlist.filter(item => item !== id); saveUserDataToCloud(); updateCounters(); renderWishlistPage(); renderProducts(); }
@@ -369,9 +359,7 @@ function addToCart(id) {
     if (existing) existing.qty += 1; else cart.push({ id: id, qty: 1 });
     saveUserDataToCloud(); updateCounters();
     const button = document.activeElement;
-    if (button && button.tagName === "BUTTON" && button.textContent.includes("CART")) { 
-        const oldText = button.innerHTML; button.innerHTML = "✓ ADDED"; setTimeout(() => { button.innerHTML = oldText; }, 1000); 
-    }
+    if (button && button.tagName === "BUTTON" && button.textContent.includes("CART")) { const oldText = button.innerHTML; button.innerHTML = "✓ ADDED"; setTimeout(() => { button.innerHTML = oldText; }, 1000); }
 }
 
 function updateCartQty(id, change) {
@@ -399,25 +387,12 @@ function renderCartPage() {
             <div class="fk-cart-item-card">
                 <div class="fk-cart-img-wrapper">
                     <img src="${product.image}" alt="${product.name}" class="fk-cart-item-img" onerror="imageFallback(this)" loading="lazy" width="120" height="120">
-                    <div class="fk-qty-controls">
-                        <button onclick="updateCartQty('${product.id}', -1)" aria-label="Decrease Quantity">-</button>
-                        <span>${cartItem.qty}</span>
-                        <button onclick="updateCartQty('${product.id}', 1)" aria-label="Increase Quantity">+</button>
-                    </div>
+                    <div class="fk-qty-controls"><button onclick="updateCartQty('${product.id}', -1)" aria-label="Decrease Quantity">-</button><span>${cartItem.qty}</span><button onclick="updateCartQty('${product.id}', 1)" aria-label="Increase Quantity">+</button></div>
                 </div>
                 <div class="fk-cart-item-details">
-                    <h4 onclick="openProductDetail('${product.id}')">${product.name}</h4>
-                    <div class="seller">Seller: Anars Computers</div>
-                    <div class="fk-cart-price-row">
-                        <span class="fk-cart-price">₹${Number(product.price).toLocaleString("en-IN")}</span>
-                        <span class="fk-cart-mrp">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span>
-                        <span class="fk-cart-discount">${discount}% Off</span>
-                    </div>
-                    <div class="fk-action-links">
-                        <button onclick="removeCartItem('${product.id}')" class="fk-text-btn" style="color:#dc2626;">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> REMOVE
-                        </button>
-                    </div>
+                    <h4 onclick="openProductDetail('${product.id}')">${product.name}</h4><div class="seller">Seller: Anars Computers</div>
+                    <div class="fk-cart-price-row"><span class="fk-cart-price">₹${Number(product.price).toLocaleString("en-IN")}</span><span class="fk-cart-mrp">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span><span class="fk-cart-discount">${discount}% Off</span></div>
+                    <div class="fk-action-links"><button onclick="removeCartItem('${product.id}')" class="fk-text-btn" style="color:#dc2626;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> REMOVE</button></div>
                 </div>
             </div>
         `;
@@ -461,31 +436,23 @@ function submitOrder(event) {
     const address = document.getElementById("shipAddress").value.trim();
     const orderId = "ANARS-" + Math.floor(1000 + Math.random() * 9000);
 
-    const newOrder = { 
-        orderId, 
-        userId: currentUser.uid,
-        date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }), 
-        name, phone, address, 
-        items: [...cart], 
-        statusIndex: 1 
-    };
+    const newOrder = { orderId, date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }), name, phone, address, items: [...cart], statusIndex: 1 };
     
-    let globalOrders = JSON.parse(localStorage.getItem("anarsOrders") || "[]");
-    globalOrders.unshift(newOrder); 
-    localStorage.setItem("anarsOrders", JSON.stringify(globalOrders));
-
-    cart = []; saveUserDataToCloud(); updateCounters();
-    document.getElementById("confirmedOrderId").textContent = orderId; showPage('success');
+    orders.unshift(newOrder); 
+    cart = []; 
+    saveUserDataToCloud(); 
+    updateCounters();
+    document.getElementById("confirmedOrderId").textContent = orderId; 
+    showPage('success');
 }
 
 function cancelOrder(orderId) {
     if (!currentUser) return;
     if (confirm("Are you sure you want to cancel this order?")) {
-        let globalOrders = JSON.parse(localStorage.getItem("anarsOrders") || "[]");
-        const order = globalOrders.find(o => o.orderId === orderId);
-        if (order && order.userId === currentUser.uid) { 
-            order.statusIndex = 0; 
-            localStorage.setItem("anarsOrders", JSON.stringify(globalOrders));
+        const orderIndex = orders.findIndex(o => o.orderId === orderId);
+        if (orderIndex > -1) { 
+            orders[orderIndex].statusIndex = 0; 
+            saveUserDataToCloud(); 
             renderMyOrdersPage(); 
             updateCounters(); 
         }
@@ -493,8 +460,7 @@ function cancelOrder(orderId) {
 }
 
 window.downloadOrderInvoice = function(orderId) {
-    let globalOrders = JSON.parse(localStorage.getItem("anarsOrders") || "[]");
-    const order = globalOrders.find(o => o.orderId === orderId);
+    const order = orders.find(o => o.orderId === orderId);
     if (!order) return;
     let subtotal = 0;
     let itemsRows = order.items.map(ci => {
@@ -513,13 +479,9 @@ window.downloadOrderInvoice = function(orderId) {
 function renderMyOrdersPage() {
     const container = document.getElementById("myOrdersListContainer");
     if (!currentUser) { container.innerHTML = `<div class="fk-empty-cart"><h3>Please login to view your orders!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="openAuthModal()">Login</button></div>`; return; }
+    if (orders.length === 0) { container.innerHTML = `<div class="fk-empty-cart"><h3>No Orders Placed Yet!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="showPage('home')">Start Shopping</button></div>`; return; }
 
-    let globalOrders = JSON.parse(localStorage.getItem("anarsOrders") || "[]");
-    let myOrders = globalOrders.filter(o => o.userId === currentUser.uid);
-
-    if (myOrders.length === 0) { container.innerHTML = `<div class="fk-empty-cart"><h3>No Orders Placed Yet!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="showPage('home')">Start Shopping</button></div>`; return; }
-
-    container.innerHTML = myOrders.map(order => {
+    container.innerHTML = orders.map(order => {
         let itemsHtml = order.items.map(cartItem => {
             const product = products.find(p => p.id == cartItem.id);
             if (!product) return "";
@@ -536,13 +498,7 @@ function renderMyOrdersPage() {
 }
 
 function updateCounters() {
-    let myOrders = [];
-    if(currentUser) {
-        let globalOrders = JSON.parse(localStorage.getItem("anarsOrders") || "[]");
-        myOrders = globalOrders.filter(o => o.userId === currentUser.uid);
-    }
-    
-    const ordersLen = myOrders.filter(o => o.statusIndex !== 0).length;
+    const ordersLen = orders.filter(o => o.statusIndex !== 0).length;
     const cartLen = cart.reduce((sum, item) => sum + item.qty, 0);
     const wishLen = wishlist.length;
 
