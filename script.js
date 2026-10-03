@@ -1,9 +1,9 @@
 /* =====================================================
-   ANARS COMPUTERS - SINGLE PAGE MERGED APP SCRIPT
+   ANARS COMPUTERS - MERGED SINGLE PAGE APP & ADMIN ENGINE
 ===================================================== */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 import { firebaseConfig } from "./config.js";
 
@@ -11,24 +11,25 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-const ADMIN_EMAIL = "mharijeyalakshmi@gmail.com"; 
+const ADMIN_EMAIL = "marijeyalakshmi@gmail.com"; 
 
 let currentUser = null;
 let isRegisterMode = false;
 let products = [];
+let cachedProducts = [];
 let storeBrands = ["ASUS", "HP", "LENOVO", "DELL", "KINGSTON", "CORSAIR", "SAMSUNG", "HIKVISION"];
 let storeCategories = ["Laptops", "Computers", "RAM", "Storage", "Motherboard", "CCTV", "Bluetooth"];
 
 let brandLogos = [];
 let isMarqueeEnabled = true;
+let uiTheme = "modern";
 
 let currentCategory = "All";
 let currentBrand = "All";
 let currentSearch = "";
 let wishlist = [];
 let cart = [];
-let orders = []; 
-let allUsersOrders = []; // For Admin View
+let orders = [];
 let productReviews = JSON.parse(localStorage.getItem("anarsProductReviews") || "{}");
 let currentSlide = 0;
 
@@ -48,7 +49,7 @@ onAuthStateChanged(auth, async (user) => {
     const authBtnContainer = document.getElementById("authButtonContainer");
 
     if (user) {
-        const isAdmin = (user.email === ADMIN_EMAIL);
+        const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
         const userDocRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userDocRef);
         
@@ -56,14 +57,10 @@ onAuthStateChanged(auth, async (user) => {
             const data = userSnap.data();
             cart = data.cart || [];
             wishlist = data.wishlist || [];
-            orders = data.orders || []; 
+            orders = data.orders || [];
         } else {
             await setDoc(userDocRef, { email: user.email, name: "", phone: "", cart: [], wishlist: [], orders: [] });
             cart = []; wishlist = []; orders = [];
-        }
-
-        if (isAdmin) {
-            await loadAllUsersOrdersForAdmin();
         }
 
         if (authBtnContainer) {
@@ -115,12 +112,8 @@ window.toggleAuthMode = function() {
     const title = document.getElementById("authModalTitle");
     const btn = document.getElementById("authSubmitBtn");
     const switchText = document.getElementById("authSwitchText");
-
-    if (isRegisterMode) {
-        title.textContent = "Create New Account"; btn.textContent = "Register Account"; switchText.textContent = "Already have an account?";
-    } else {
-        title.textContent = "Customer Login"; btn.textContent = "Login to Store"; switchText.textContent = "Don't have an account?";
-    }
+    if (isRegisterMode) { title.textContent = "Create New Account"; btn.textContent = "Register Account"; switchText.textContent = "Already have an account?"; } 
+    else { title.textContent = "Customer Login"; btn.textContent = "Login to Store"; switchText.textContent = "Don't have an account?"; }
 };
 
 window.handleEmailAuth = async function(event) {
@@ -132,12 +125,11 @@ window.handleEmailAuth = async function(event) {
             const res = await createUserWithEmailAndPassword(auth, email, password);
             await setDoc(doc(db, "users", res.user.uid), { email, name: "", phone: "", cart: [], wishlist: [], orders: [] });
             alert("Account registered successfully!");
-            closeAuthModal();
         } else {
             await signInWithEmailAndPassword(auth, email, password);
             alert("Logged in successfully!");
-            closeAuthModal();
         }
+        closeAuthModal();
     } catch (e) { console.error("Auth Error:", e); alert("Authentication failed: " + e.message); }
 };
 
@@ -150,13 +142,11 @@ window.openAccountModal = async function() {
     const menu = document.getElementById("profileDropdownMenu");
     if (menu) menu.classList.remove("active");
     if (!currentUser) return;
-
     const modal = document.getElementById("accountModal");
     const content = document.getElementById("accountModalContent");
     const userDocRef = doc(db, "users", currentUser.uid);
     const snap = await getDoc(userDocRef);
     const data = snap.exists() ? snap.data() : {};
-
     content.innerHTML = `
         <div class="fs-profile-group"><label>Full Legal Name</label><input type="text" id="profName" value="${data.name || ''}" placeholder="Enter your full name"></div>
         <div class="fs-profile-group"><label>Primary Email Address</label><input type="email" value="${currentUser.email}" disabled style="background:#e2e8f0; cursor:not-allowed; color:#64748b;"></div>
@@ -185,7 +175,10 @@ async function loadStoreMetadata() {
             if (data.categories) storeCategories = data.categories;
             if (data.brandLogos) brandLogos = data.brandLogos;
             if (data.isMarqueeEnabled !== undefined) isMarqueeEnabled = data.isMarqueeEnabled;
-            if (data.uiTheme) { document.body.setAttribute('data-theme', data.uiTheme); }
+            if (data.uiTheme) { 
+                uiTheme = data.uiTheme;
+                document.body.setAttribute('data-theme', uiTheme); 
+            }
         }
     } catch (e) { console.error("Error loading metadata: ", e); }
     renderBrandFilters(); renderCategoriesGrid(); renderBrandLogosFrontEnd();
@@ -196,11 +189,18 @@ function renderBrandLogosFrontEnd() {
     const trackWrapper = document.getElementById("brandLogosTrack");
     if (!section || !trackWrapper) return;
     if (brandLogos.length === 0) { section.style.display = "none"; return; }
+    
     section.style.display = "block";
     const sortedLogos = [...brandLogos].sort((a, b) => a.pos - b.pos);
     let html = sortedLogos.map(l => `<div class="brand-logo-item" title="${l.name}"><img src="${l.url}" alt="${l.name}" width="120" height="40" loading="lazy"></div>`).join("");
-    if (isMarqueeEnabled) { trackWrapper.innerHTML = `<div class="brand-track-inner">${html}</div><div class="brand-track-inner">${html}</div>`; trackWrapper.className = "brand-track marquee-active"; } 
-    else { trackWrapper.innerHTML = html; trackWrapper.className = "brand-track static"; }
+    
+    if (isMarqueeEnabled) { 
+        trackWrapper.innerHTML = `<div class="brand-track-inner">${html}</div><div class="brand-track-inner">${html}</div>`; 
+        trackWrapper.className = "brand-track marquee-active"; 
+    } else { 
+        trackWrapper.innerHTML = html; 
+        trackWrapper.className = "brand-track static"; 
+    }
 }
 
 async function loadProductsFromFirebase() {
@@ -209,7 +209,7 @@ async function loadProductsFromFirebase() {
         products = [];
         querySnapshot.forEach((docSnap) => { products.push({ id: docSnap.id, ...docSnap.data() }); });
         renderProducts();
-        renderAdminProductsList();
+        if(document.getElementById("adminTabProducts")) loadAdminProducts();
     } catch (e) { console.error("Error loading products: ", e); }
 }
 
@@ -230,18 +230,12 @@ function renderCategoriesGrid() {
     }).join("");
 }
 
-function showPage(pageId) {
-    if (pageId === 'admin') {
-        if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
-            alert("🔒 Unauthorized access! Admin only.");
-            return;
-        }
-        renderAdminProductsList();
-        renderAdminOrdersList();
-    }
-
+window.showPage = function(pageId) {
     if ((pageId === 'cart' || pageId === 'wishlist' || pageId === 'orders') && !currentUser) {
         alert("🔒 Please login to access your cart, wishlist & orders!"); return openAuthModal();
+    }
+    if (pageId === 'admin' && (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase())) {
+        alert("Access denied! Admins only."); return;
     }
     document.querySelectorAll(".page-view").forEach(page => page.classList.remove("active"));
     if (pageId === 'home') document.getElementById("homePage").classList.add("active");
@@ -251,7 +245,7 @@ function showPage(pageId) {
     else if (pageId === 'checkout') { renderCheckoutSummary(); document.getElementById("checkoutPage").classList.add("active"); }
     else if (pageId === 'success') { document.getElementById("successPage").classList.add("active"); }
     else if (pageId === 'orders') { renderMyOrdersPage(); document.getElementById("ordersPage").classList.add("active"); }
-    else if (pageId === 'admin') document.getElementById("adminPage").classList.add("active");
+    else if (pageId === 'admin') { document.getElementById("adminPage").classList.add("active"); loadAdminOrders(); loadAdminProducts(); loadAdminBrandLogos(); }
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -286,6 +280,7 @@ function renderProducts() {
 function filterCategory(category) { currentCategory = category; currentBrand = "All"; currentSearch = ""; document.getElementById("searchInput").value = ""; showPage('home'); renderProducts(); scrollToProducts(); }
 function filterBrand(brand) { currentBrand = brand; renderProducts(); }
 function searchProducts() { currentSearch = document.getElementById("searchInput").value.trim(); currentCategory = "All"; currentBrand = "All"; renderProducts(); }
+window.searchProductsMobile = function() { currentSearch = document.getElementById("mobileSearchInputSidebar").value.trim(); currentCategory = "All"; currentBrand = "All"; showPage('home'); renderProducts(); toggleMobileMenu(); scrollToProducts(); }
 function showAllProducts() { currentCategory = "All"; currentBrand = "All"; currentSearch = ""; document.getElementById("searchInput").value = ""; renderProducts(); }
 
 function openProductDetail(id) {
@@ -294,222 +289,19 @@ function openProductDetail(id) {
     const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
     const reviews = productReviews[id] || [];
 
-    let reviewsHtml = reviews.length === 0 ? `<p style="color:#64748b; font-size:13px; margin-top:10px;">No reviews yet.</p>` : 
-        reviews.map(r => `<div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:8px; margin-top:10px;"><div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700;"><span>${r.name}</span><span style="color:#d97706;">${'★'.repeat(r.rating)}</span></div><p style="font-size:13px; color:#475569; margin-top:4px;">${r.comment}</p></div>`).join("");
+    let reviewsHtml = reviews.length === 0 ? `<p style="color:#64748b; font-size:13px; margin-top:10px;">No reviews yet. Be the first to review this product!</p>` : 
+        reviews.map(r => `<div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:8px; margin-top:10px;"><div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:#0f172a;"><span>${r.name}</span><span style="color:#d97706;">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span></div><p style="font-size:13px; color:#475569; margin-top:4px;">${r.comment}</p></div>`).join("");
 
     document.getElementById("productDetailContainer").innerHTML = `
         <div class="full-detail-card">
             <div class="full-detail-img-box"><img src="${product.image}" alt="${product.name}" onerror="imageFallback(this)" loading="lazy" width="400" height="400"></div>
             <div class="full-detail-content">
                 <span class="product-brand">${product.brand}</span><h2>${product.name}</h2>
+                <div><span class="fk-rating-badge">5.0 Star Store</span><span style="font-size:13px; color:#64748b; margin-left:8px;">Annai Complex, Kuthukalvalasai</span></div>
                 <div class="fk-price-row"><span class="fk-current-price">₹${Number(product.price).toLocaleString("en-IN")}</span><span class="fk-original-price">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span><span class="fk-offer-tag">${discount}% Off</span></div>
-                <div class="fk-highlights-box"><h4>Specifications</h4><p>${product.description}</p></div>
-                <div class="fk-action-buttons"><button class="fk-add-cart-btn" onclick="addToCart('${product.id}')">ADD TO CART</button></div>
+                <div class="fk-highlights-box"><h4>Product Overview & Specifications</h4><p>${product.description}</p></div>
+                <div class="fk-action-buttons"><button class="fk-add-cart-btn" onclick="addToCart('${product.id}')">ADD TO CART</button><button class="fk-buy-btn" onclick="addToCart('${product.id}'); showPage('cart')">PROCEED TO CART</button></div>
             </div>
         </div>
         <div class="admin-card" style="margin-top: 30px; background:white; padding:30px; border-radius:16px; border:1px solid #e2e8f0;">
-            <h3>Customer Reviews</h3>
-            <div style="max-height: 250px; overflow-y:auto; margin-bottom:20px;">${reviewsHtml}</div>
-        </div>
-    `;
-    showPage('detail');
-}
-
-function toggleWishlist(id) {
-    if (!currentUser) return openAuthModal();
-    if (wishlist.includes(id)) wishlist = wishlist.filter(item => item !== id); else wishlist.push(id);
-    saveUserDataToCloud(); updateCounters(); renderProducts();
-    if (document.getElementById("wishlistPage").classList.contains("active")) renderWishlistPage();
-}
-
-function renderWishlistPage() {
-    const content = document.getElementById("wishlistPageContent");
-    if (!currentUser) return;
-    const items = wishlist.map(id => products.find(product => product.id == id)).filter(Boolean);
-    if (items.length === 0) { content.innerHTML = `<div class="fk-empty-cart"><h3>Your wishlist is empty!</h3></div>`; return; }
-    content.innerHTML = items.map(product => `
-        <div class="fk-cart-item-card">
-            <img src="${product.image}" alt="${product.name}" width="100" height="100" style="object-fit:cover; border-radius:8px;">
-            <div class="fk-cart-item-details">
-                <h4>${product.name}</h4>
-                <p>₹${Number(product.price).toLocaleString("en-IN")}</p>
-                <button onclick="removeWishlist('${product.id}')" style="color:red; background:none; border:none; cursor:pointer;">Remove</button>
-            </div>
-        </div>`).join("");
-}
-
-function removeWishlist(id) { wishlist = wishlist.filter(item => item !== id); saveUserDataToCloud(); updateCounters(); renderWishlistPage(); renderProducts(); }
-
-function addToCart(id) {
-    if (!currentUser) return openAuthModal();
-    const existing = cart.find(item => item.id == id);
-    if (existing) existing.qty += 1; else cart.push({ id: id, qty: 1 });
-    saveUserDataToCloud(); updateCounters();
-    alert("Added to Cart!");
-}
-
-function updateCartQty(id, change) {
-    const item = cart.find(i => i.id == id);
-    if (item) { item.qty += change; if (item.qty <= 0) cart = cart.filter(i => i.id != id); }
-    saveUserDataToCloud(); updateCounters(); renderCartPage();
-}
-
-function removeCartItem(id) { cart = cart.filter(i => i.id != id); saveUserDataToCloud(); updateCounters(); renderCartPage(); }
-
-function renderCartPage() {
-    const content = document.getElementById("cartPageContent");
-    if (!currentUser) return;
-    if (cart.length === 0) { content.innerHTML = `<div class="fk-empty-cart"><h3>Cart is empty!</h3></div>`; return; }
-
-    let totalMRP = 0; let totalDiscountPrice = 0;
-    let itemsHTML = cart.map(cartItem => {
-        const product = products.find(p => p.id == cartItem.id);
-        if (!product) return "";
-        totalMRP += product.originalPrice * cartItem.qty; totalDiscountPrice += product.price * cartItem.qty;
-        return `
-            <div class="fk-cart-item-card" style="display:flex; gap:15px; align-items:center; background:white; padding:15px; border-radius:12px; margin-bottom:12px; border:1px solid #e2e8f0;">
-                <img src="${product.image}" width="80" height="80" style="object-fit:cover; border-radius:8px;">
-                <div style="flex:1;">
-                    <h4>${product.name}</h4>
-                    <p>₹${Number(product.price).toLocaleString("en-IN")} x ${cartItem.qty}</p>
-                    <div style="display:flex; gap:10px; margin-top:8px;">
-                        <button onclick="updateCartQty('${product.id}', -1)" style="padding:2px 8px;">-</button>
-                        <span>${cartItem.qty}</span>
-                        <button onclick="updateCartQty('${product.id}', 1)" style="padding:2px 8px;">+</button>
-                        <button onclick="removeCartItem('${product.id}')" style="color:red; border:none; background:none; cursor:pointer; margin-left:15px;">Remove</button>
-                    </div>
-                </div>
-            </div>`;
-    }).join("");
-
-    content.innerHTML = `<div class="fk-cart-layout">${itemsHTML}</div><button class="primary-btn" onclick="showPage('checkout')" style="margin-top:20px; padding:12px 24px;">Proceed to Checkout</button>`;
-}
-
-function renderCheckoutSummary() {
-    let total = 0;
-    cart.forEach(ci => { const p = products.find(x => x.id == ci.id); if(p) total += p.price * ci.qty; });
-    document.getElementById("checkoutSummarySidebar").innerHTML = `<h4>Payable Amount: <strong>₹${total.toLocaleString("en-IN")}</strong></h4>`;
-}
-
-async function submitOrder(event) {
-    event.preventDefault();
-    if (!currentUser) return;
-    const name = document.getElementById("shipName").value.trim();
-    const phone = document.getElementById("shipPhone").value.trim();
-    const address = document.getElementById("shipAddress").value.trim();
-    const orderId = "ANARS-" + Math.floor(1000 + Math.random() * 9000);
-
-    const newOrder = { orderId, date: new Date().toLocaleDateString('en-IN'), name, phone, address, items: [...cart], statusIndex: 1, userId: currentUser.uid };
-    
-    orders.unshift(newOrder); 
-    cart = []; 
-    await saveUserDataToCloud(); 
-    updateCounters();
-    document.getElementById("confirmedOrderId").textContent = orderId; 
-    showPage('success');
-}
-
-function renderMyOrdersPage() {
-    const container = document.getElementById("myOrdersListContainer");
-    if (!currentUser || orders.length === 0) { container.innerHTML = `<p>No orders found.</p>`; return; }
-    container.innerHTML = orders.map(o => `
-        <div style="background:white; padding:20px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
-            <h4>Order ID: #${o.orderId}</h4>
-            <p>Date: ${o.date} | Status: ${o.statusIndex === 1 ? 'Order Placed' : 'Processed'}</p>
-            <p>Address: ${o.address}</p>
-        </div>`).join("");
-}
-
-// ================= ADMIN FUNCTIONS =================
-window.switchAdminTab = function(tab) {
-    if(tab === 'products') {
-        document.getElementById("adminProductsSection").style.display = "block";
-        document.getElementById("adminOrdersSection").style.display = "none";
-        document.getElementById("adminTabProdBtn").className = "primary-btn";
-        document.getElementById("adminTabOrdersBtn").className = "secondary-btn";
-    } else {
-        document.getElementById("adminProductsSection").style.display = "none";
-        document.getElementById("adminOrdersSection").style.display = "block";
-        document.getElementById("adminTabProdBtn").className = "secondary-btn";
-        document.getElementById("adminTabOrdersBtn").className = "primary-btn";
-    }
-};
-
-window.handleAddNewProduct = async function(event) {
-    event.preventDefault();
-    const name = document.getElementById("adminProdName").value.trim();
-    const brand = document.getElementById("adminProdBrand").value.trim();
-    const category = document.getElementById("adminProdCategory").value;
-    const price = Number(document.getElementById("adminProdPrice").value);
-    const originalPrice = Number(document.getElementById("adminProdOriginalPrice").value);
-    const image = document.getElementById("adminProdImage").value.trim();
-    const description = document.getElementById("adminProdDesc").value.trim();
-
-    try {
-        await addDoc(collection(db, "products"), { name, brand, category, price, originalPrice, image, description });
-        alert("Product added successfully!");
-        event.target.reset();
-        await loadProductsFromFirebase();
-    } catch(e) { console.error(e); alert("Failed to add product."); }
-};
-
-window.deleteProduct = async function(id) {
-    if(confirm("Are you sure you want to delete this product?")) {
-        try {
-            await deleteDoc(doc(db, "products", id));
-            alert("Product deleted.");
-            await loadProductsFromFirebase();
-        } catch(e) { alert("Failed to delete."); }
-    }
-};
-
-function renderAdminProductsList() {
-    const grid = document.getElementById("adminProductListGrid");
-    if(!grid) return;
-    grid.innerHTML = products.map(p => `
-        <div style="background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;">
-            <img src="${p.image}" width="100%" height="150" style="object-fit:cover; border-radius:8px;">
-            <h4 style="margin-top:10px;">${p.name}</h4>
-            <p>₹${p.price} (${p.brand})</p>
-            <button onclick="deleteProduct('${p.id}')" style="background:#dc2626; color:white; border:none; padding:6px 12px; border-radius:6px; margin-top:8px; cursor:pointer;">Delete Product</button>
-        </div>`).join("");
-}
-
-async function loadAllUsersOrdersForAdmin() {
-    try {
-        const snap = await getDocs(collection(db, "users"));
-        allUsersOrders = [];
-        snap.forEach(d => {
-            const data = d.data();
-            if(data.orders && Array.isArray(data.orders)) {
-                allUsersOrders.push(...data.orders);
-            }
-        });
-        renderAdminOrdersList();
-    } catch(e) { console.error(e); }
-}
-
-function renderAdminOrdersList() {
-    const container = document.getElementById("adminOrdersListContainer");
-    if(!container) return;
-    if(allUsersOrders.length === 0) { container.innerHTML = `<p>No customer orders yet.</p>`; return; }
-    container.innerHTML = allUsersOrders.map(o => `
-        <div style="background:white; padding:20px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
-            <h4>Order ID: #${o.orderId}</h4>
-            <p><strong>Customer:</strong> ${o.name} (${o.phone})</p>
-            <p><strong>Address:</strong> ${o.address}</p>
-            <p><strong>Date:</strong> ${o.date}</p>
-        </div>`).join("");
-}
-
-function updateCounters() {
-    const ordersLen = orders.filter(o => o.statusIndex !== 0).length;
-    const cartLen = cart.reduce((sum, item) => sum + item.qty, 0);
-    const wishLen = wishlist.length;
-
-    if(document.getElementById("wishlistCount")) document.getElementById("wishlistCount").textContent = wishLen;
-    if(document.getElementById("cartCount")) document.getElementById("cartCount").textContent = cartLen;
-    if(document.getElementById("ordersCount")) document.getElementById("ordersCount").textContent = ordersLen;
-}
-
-window.showPage = showPage; window.filterCategory = filterCategory; window.filterBrand = filterBrand; window.searchProducts = searchProducts; window.showAllProducts = showAllProducts; window.openProductDetail = openProductDetail; window.toggleWishlist = toggleWishlist; window.removeWishlist = removeWishlist; window.addToCart = addToCart; window.updateCartQty = updateCartQty; window.removeCartItem = removeCartItem; window.submitOrder = submitOrder; window.openAuthModal = openAuthModal; window.closeAuthModal = closeAuthModal; window.toggleAuthMode = toggleAuthMode; window.handleEmailAuth = handleEmailAuth; window.handleLogout = handleLogout; window.toggleProfileDropdown = toggleProfileDropdown; window.openAccountModal = openAccountModal; window.closeAccountModal = closeAccountModal; window.saveUserProfile = saveUserProfile;
+            <h3 style="font-size:18px; font-weight:800; color:
