@@ -1,10 +1,6 @@
-/* =====================================================
-   ANARS COMPUTERS - MERGED SINGLE PAGE APP & ADMIN ENGINE
-===================================================== */
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 import { firebaseConfig } from "./config.js";
 
 const app = initializeApp(firebaseConfig);
@@ -15,6 +11,7 @@ const ADMIN_EMAIL = "mharijeyalakshmi@gmail.com";
 
 let currentUser = null;
 let isRegisterMode = false;
+let isForgotPasswordMode = false;
 let products = [];
 let cachedProducts = [];
 let storeBrands = ["ASUS", "HP", "LENOVO", "DELL", "KINGSTON", "CORSAIR", "SAMSUNG", "HIKVISION"];
@@ -111,28 +108,74 @@ window.closeAuthModal = function() { document.getElementById("authModal").classL
 
 window.toggleAuthMode = function() {
     isRegisterMode = !isRegisterMode;
+    isForgotPasswordMode = false;
     const title = document.getElementById("authModalTitle");
+    const subtitle = document.getElementById("authSubtitle");
     const btn = document.getElementById("authSubmitBtn");
-    const switchText = document.getElementById("authSwitchText");
-    if (isRegisterMode) { title.textContent = "Create New Account"; btn.textContent = "Register Account"; switchText.textContent = "Already have an account?"; } 
-    else { title.textContent = "Customer Login"; btn.textContent = "Login to Store"; switchText.textContent = "Don't have an account?"; }
+    const switchLink = document.getElementById("authSwitchLink");
+    const passGroup = document.getElementById("passwordInputGroup");
+    const forgotLink = document.getElementById("forgotPasswordLink");
+
+    if (isRegisterMode) {
+        title.textContent = "Create New Account";
+        subtitle.textContent = "Sign up to track your orders and wishlist.";
+        btn.textContent = "Register Account";
+        switchLink.textContent = "Already have an account? Login";
+        passGroup.style.display = "block";
+        document.getElementById("authPassword").setAttribute("required", "true");
+        forgotLink.style.display = "none";
+    } else {
+        title.textContent = "Customer Login";
+        subtitle.textContent = "Please enter your details to continue.";
+        btn.textContent = "Login to Store";
+        switchLink.textContent = "Register here";
+        passGroup.style.display = "block";
+        document.getElementById("authPassword").setAttribute("required", "true");
+        forgotLink.style.display = "block";
+    }
+};
+
+window.toggleForgotPasswordMode = function() {
+    isForgotPasswordMode = true;
+    isRegisterMode = false;
+    const title = document.getElementById("authModalTitle");
+    const subtitle = document.getElementById("authSubtitle");
+    const btn = document.getElementById("authSubmitBtn");
+    const switchLink = document.getElementById("authSwitchLink");
+    const passGroup = document.getElementById("passwordInputGroup");
+    const forgotLink = document.getElementById("forgotPasswordLink");
+
+    title.textContent = "Reset Password";
+    subtitle.textContent = "Enter your email to receive a password reset link.";
+    btn.textContent = "Send Reset Link";
+    switchLink.textContent = "Back to Login";
+    passGroup.style.display = "none";
+    document.getElementById("authPassword").removeAttribute("required");
+    forgotLink.style.display = "none";
 };
 
 window.handleEmailAuth = async function(event) {
     event.preventDefault();
     const email = document.getElementById("authEmail").value.trim();
-    const password = document.getElementById("authPassword").value.trim();
+    const password = document.getElementById("authPassword") ? document.getElementById("authPassword").value.trim() : "";
+
     try {
-        if (isRegisterMode) {
+        if (isForgotPasswordMode) {
+            await sendPasswordResetEmail(auth, email);
+            alert("Password reset email sent! Check your inbox.");
+            isForgotPasswordMode = false;
+            toggleAuthMode();
+        } else if (isRegisterMode) {
             const res = await createUserWithEmailAndPassword(auth, email, password);
             await setDoc(doc(db, "users", res.user.uid), { email, name: "", phone: "", cart: [], wishlist: [], orders: [] });
             alert("Account registered successfully!");
+            closeAuthModal();
         } else {
             await signInWithEmailAndPassword(auth, email, password);
             alert("Logged in successfully!");
+            closeAuthModal();
         }
-        closeAuthModal();
-    } catch (e) { console.error("Auth Error:", e); alert("Authentication failed: " + e.message); }
+    } catch (e) { console.error("Auth Error:", e); alert("Operation failed: " + e.message); }
 };
 
 window.handleLogout = async function() {
@@ -191,11 +234,9 @@ function renderBrandLogosFrontEnd() {
     const trackWrapper = document.getElementById("brandLogosTrack");
     if (!section || !trackWrapper) return;
     if (brandLogos.length === 0) { section.style.display = "none"; return; }
-    
     section.style.display = "block";
     const sortedLogos = [...brandLogos].sort((a, b) => a.pos - b.pos);
     let html = sortedLogos.map(l => `<div class="brand-logo-item" title="${l.name}"><img src="${l.url}" alt="${l.name}" width="120" height="40" loading="lazy"></div>`).join("");
-    
     if (isMarqueeEnabled) { 
         trackWrapper.innerHTML = `<div class="brand-track-inner">${html}${html}</div>`; 
         trackWrapper.className = "brand-track marquee-active"; 
@@ -541,7 +582,7 @@ window.toggleMobileMenu = function() {
 };
 
 // =====================================================
-// ADMIN ENGINE MERGED
+// ADMIN ENGINE MERGED (REAL-TIME GLOBAL FIREBASE SYNC)
 // =====================================================
 window.switchAdminTab = function(tab) {
     const oSec = document.getElementById("adminTabOrders");
@@ -617,7 +658,16 @@ window.updateAdminOrderStatus = async function (uid, orderIndex, newStatus) {
             let userData = userSnap.data();
             userData.orders[orderIndex].statusIndex = Number(newStatus);
             await updateDoc(userRef, { orders: userData.orders });
-            alert("Order status updated in Live Database!");
+            
+            // If currently logged in user is this customer, update local state instantly
+            if (currentUser && currentUser.uid === uid) {
+                orders = userData.orders;
+                updateCounters();
+                if(document.getElementById("ordersPage") && document.getElementById("ordersPage").classList.contains("active")) {
+                    renderMyOrdersPage();
+                }
+            }
+            alert("Order status updated in Live Database and synced instantly!");
             loadAdminOrders();
         }
     } catch (e) { alert("Failed to update status."); }
