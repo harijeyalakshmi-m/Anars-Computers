@@ -1,7 +1,4 @@
-/* =====================================================
-    ANARS COMPUTERS - ULTRA MODERN UI STYLING & RESPONSIVE
-===================================================== */
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap");
+@import url("[https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap)");
 
 * {
   margin: 0;
@@ -49,6 +46,7 @@ a {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   letter-spacing: 0.5px;
   overflow: hidden;
+  width: 100%;
 }
 .page-view {
   display: none;
@@ -559,7 +557,7 @@ a {
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
 }
 
-/* 🌟 OVERFLOW FIX FOR PRODUCT CARDS 🌟 */
+/* PRODUCT CARDS (OVERFLOW FIX) */
 .product-card {
   position: relative;
   background: white;
