@@ -90,9 +90,9 @@ onAuthStateChanged(auth, async (user) => {
         cart = []; wishlist = []; orders = [];
     }
     updateCounters();
-    if (document.getElementById("cartPage").classList.contains("active")) renderCartPage();
-    if (document.getElementById("wishlistPage").classList.contains("active")) renderWishlistPage();
-    if (document.getElementById("ordersPage").classList.contains("active")) renderMyOrdersPage();
+    if (document.getElementById("cartPage") && document.getElementById("cartPage").classList.contains("active")) renderCartPage();
+    if (document.getElementById("wishlistPage") && document.getElementById("wishlistPage").classList.contains("active")) renderWishlistPage();
+    if (document.getElementById("ordersPage") && document.getElementById("ordersPage").classList.contains("active")) renderMyOrdersPage();
 });
 
 async function saveUserDataToCloud() {
@@ -209,7 +209,7 @@ async function loadProductsFromFirebase() {
         products = [];
         querySnapshot.forEach((docSnap) => { products.push({ id: docSnap.id, ...docSnap.data() }); });
         renderProducts();
-        if(document.getElementById("adminTabProducts")) loadAdminProducts();
+        if(document.getElementById("adminProductsTableBody")) loadAdminProducts();
     } catch (e) { console.error("Error loading products: ", e); }
 }
 
@@ -253,6 +253,8 @@ function renderProducts() {
     const grid = document.getElementById("productGrid");
     const noProducts = document.getElementById("noProducts");
     const heading = document.getElementById("productHeading");
+    if (!grid) return;
+
     let filtered = products.filter(product => {
         const categoryMatch = currentCategory === "All" || product.category === currentCategory;
         const brandMatch = currentBrand === "All" || product.brand.toLowerCase() === currentBrand.toLowerCase();
@@ -261,9 +263,10 @@ function renderProducts() {
         return categoryMatch && brandMatch && searchMatch;
     });
 
-    heading.textContent = currentCategory === "All" ? "All Products" : currentCategory;
-    if (filtered.length === 0) { grid.innerHTML = ""; noProducts.style.display = "block"; return; }
-    noProducts.style.display = "none";
+    if (heading) heading.textContent = currentCategory === "All" ? "All Products" : currentCategory;
+    if (filtered.length === 0) { grid.innerHTML = ""; if(noProducts) noProducts.style.display = "block"; return; }
+    if(noProducts) noProducts.style.display = "none";
+    
     grid.innerHTML = filtered.map(product => {
         const isWishlisted = wishlist.includes(product.id);
         const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
@@ -277,13 +280,13 @@ function renderProducts() {
     renderBrandFilters();
 }
 
-function filterCategory(category) { currentCategory = category; currentBrand = "All"; currentSearch = ""; document.getElementById("searchInput").value = ""; showPage('home'); renderProducts(); scrollToProducts(); }
-function filterBrand(brand) { currentBrand = brand; renderProducts(); }
-function searchProducts() { currentSearch = document.getElementById("searchInput").value.trim(); currentCategory = "All"; currentBrand = "All"; renderProducts(); }
-window.searchProductsMobile = function() { currentSearch = document.getElementById("mobileSearchInputSidebar").value.trim(); currentCategory = "All"; currentBrand = "All"; showPage('home'); renderProducts(); toggleMobileMenu(); scrollToProducts(); }
-function showAllProducts() { currentCategory = "All"; currentBrand = "All"; currentSearch = ""; document.getElementById("searchInput").value = ""; renderProducts(); }
+window.filterCategory = function(category) { currentCategory = category; currentBrand = "All"; currentSearch = ""; const sInput = document.getElementById("searchInput"); if(sInput) sInput.value = ""; showPage('home'); renderProducts(); scrollToProducts(); };
+window.filterBrand = function(brand) { currentBrand = brand; renderProducts(); };
+window.searchProducts = function() { const sInput = document.getElementById("searchInput"); if(sInput) currentSearch = sInput.value.trim(); currentCategory = "All"; currentBrand = "All"; renderProducts(); };
+window.searchProductsMobile = function() { const mInput = document.getElementById("mobileSearchInputSidebar"); if(mInput) currentSearch = mInput.value.trim(); currentCategory = "All"; currentBrand = "All"; showPage('home'); renderProducts(); toggleMobileMenu(); scrollToProducts(); };
+window.showAllProducts = function() { currentCategory = "All"; currentBrand = "All"; currentSearch = ""; const sInput = document.getElementById("searchInput"); if(sInput) sInput.value = ""; renderProducts(); };
 
-function openProductDetail(id) {
+window.openProductDetail = function(id) {
     const product = products.find(item => item.id == id);
     if (!product) return;
     const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
@@ -292,30 +295,33 @@ function openProductDetail(id) {
     let reviewsHtml = reviews.length === 0 ? `<p style="color:#64748b; font-size:13px; margin-top:10px;">No reviews yet. Be the first to review this product!</p>` : 
         reviews.map(r => `<div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:8px; margin-top:10px;"><div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:#0f172a;"><span>${r.name}</span><span style="color:#d97706;">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span></div><p style="font-size:13px; color:#475569; margin-top:4px;">${r.comment}</p></div>`).join("");
 
-    document.getElementById("productDetailContainer").innerHTML = `
-        <div class="full-detail-card">
-            <div class="full-detail-img-box"><img src="${product.image}" alt="${product.name}" onerror="imageFallback(this)" loading="lazy" width="400" height="400"></div>
-            <div class="full-detail-content">
-                <span class="product-brand">${product.brand}</span><h2>${product.name}</h2>
-                <div><span class="fk-rating-badge">5.0 Star Store</span><span style="font-size:13px; color:#64748b; margin-left:8px;">Annai Complex, Kuthukalvalasai</span></div>
-                <div class="fk-price-row"><span class="fk-current-price">₹${Number(product.price).toLocaleString("en-IN")}</span><span class="fk-original-price">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span><span class="fk-offer-tag">${discount}% Off</span></div>
-                <div class="fk-highlights-box"><h4>Product Overview & Specifications</h4><p>${product.description}</p></div>
-                <div class="fk-action-buttons"><button class="fk-add-cart-btn" onclick="addToCart('${product.id}')">ADD TO CART</button><button class="fk-buy-btn" onclick="addToCart('${product.id}'); showPage('cart')">PROCEED TO CART</button></div>
+    const detailContainer = document.getElementById("productDetailContainer");
+    if(detailContainer) {
+        detailContainer.innerHTML = `
+            <div class="full-detail-card">
+                <div class="full-detail-img-box"><img src="${product.image}" alt="${product.name}" onerror="imageFallback(this)" loading="lazy" width="400" height="400"></div>
+                <div class="full-detail-content">
+                    <span class="product-brand">${product.brand}</span><h2>${product.name}</h2>
+                    <div><span class="fk-rating-badge">5.0 Star Store</span><span style="font-size:13px; color:#64748b; margin-left:8px;">Annai Complex, Kuthukalvalasai</span></div>
+                    <div class="fk-price-row"><span class="fk-current-price">₹${Number(product.price).toLocaleString("en-IN")}</span><span class="fk-original-price">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span><span class="fk-offer-tag">${discount}% Off</span></div>
+                    <div class="fk-highlights-box"><h4>Product Overview & Specifications</h4><p>${product.description}</p></div>
+                    <div class="fk-action-buttons"><button class="fk-add-cart-btn" onclick="addToCart('${product.id}')">ADD TO CART</button><button class="fk-buy-btn" onclick="addToCart('${product.id}'); showPage('cart')">PROCEED TO CART</button></div>
+                </div>
             </div>
-        </div>
-        <div class="admin-card" style="margin-top: 30px; background:white; padding:30px; border-radius:16px; border:1px solid #e2e8f0;">
-            <h3 style="font-size:18px; font-weight:800; color:#0f172a; margin-bottom:15px;">Customer Reviews & Ratings</h3>
-            <div style="max-height: 250px; overflow-y:auto; margin-bottom:20px;">${reviewsHtml}</div>
-            <h4 style="font-size:14px; font-weight:700; color:#334155; margin-bottom:10px;">Write a Review</h4>
-            <form onsubmit="submitProductReview(event, '${product.id}')" style="display:flex; flex-direction:column; gap:12px;">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"><input type="text" id="revName" placeholder="Your Name" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px;"><select id="revRating" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; font-weight:600;"><option value="5">5 Stars - Excellent</option><option value="4">4 Stars - Very Good</option><option value="3">3 Stars - Good</option></select></div>
-                <textarea id="revComment" placeholder="Write your feedback..." rows="3" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none; font-family:inherit;"></textarea>
-                <button type="submit" class="primary-btn" style="width:max-content; padding:10px 20px;">Post Review</button>
-            </form>
-        </div>
-    `;
+            <div class="admin-card" style="margin-top: 30px; background:white; padding:30px; border-radius:16px; border:1px solid #e2e8f0;">
+                <h3 style="font-size:18px; font-weight:800; color:#0f172a; margin-bottom:15px;">Customer Reviews & Ratings</h3>
+                <div style="max-height: 250px; overflow-y:auto; margin-bottom:20px;">${reviewsHtml}</div>
+                <h4 style="font-size:14px; font-weight:700; color:#334155; margin-bottom:10px;">Write a Review</h4>
+                <form onsubmit="submitProductReview(event, '${product.id}')" style="display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"><input type="text" id="revName" placeholder="Your Name" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px;"><select id="revRating" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; font-weight:600;"><option value="5">5 Stars - Excellent</option><option value="4">4 Stars - Very Good</option><option value="3">3 Stars - Good</option></select></div>
+                    <textarea id="revComment" placeholder="Write your feedback..." rows="3" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none; font-family:inherit;"></textarea>
+                    <button type="submit" class="primary-btn" style="width:max-content; padding:10px 20px;">Post Review</button>
+                </form>
+            </div>
+        `;
+    }
     showPage('detail');
-}
+};
 
 window.submitProductReview = function(event, productId) {
     event.preventDefault();
@@ -329,15 +335,17 @@ window.submitProductReview = function(event, productId) {
     alert("Review submitted successfully!"); openProductDetail(productId);
 };
 
-function toggleWishlist(id) {
+window.toggleWishlist = function(id) {
     if (!currentUser) { alert("🔒 Please login to save items to your wishlist!"); return openAuthModal(); }
     if (wishlist.includes(id)) wishlist = wishlist.filter(item => item !== id); else wishlist.push(id);
     saveUserDataToCloud(); updateCounters(); renderProducts();
-    if (document.getElementById("wishlistPage").classList.contains("active")) renderWishlistPage();
-}
+    const wPage = document.getElementById("wishlistPage");
+    if (wPage && wPage.classList.contains("active")) renderWishlistPage();
+};
 
 function renderWishlistPage() {
     const content = document.getElementById("wishlistPageContent");
+    if (!content) return;
     if (!currentUser) { content.innerHTML = `<div class="fk-empty-cart"><h3>Please login to view your wishlist!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="openAuthModal()">Login</button></div>`; return; }
     const items = wishlist.map(id => products.find(product => product.id == id)).filter(Boolean);
     if (items.length === 0) { content.innerHTML = `<div class="fk-empty-cart"><h3>Your wishlist is empty!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="showPage('home')">Browse Store</button></div>`; return; }
@@ -360,28 +368,29 @@ function renderWishlistPage() {
     `}).join("");
 }
 
-function removeWishlist(id) { if (!currentUser) return; wishlist = wishlist.filter(item => item !== id); saveUserDataToCloud(); updateCounters(); renderWishlistPage(); renderProducts(); }
+window.removeWishlist = function(id) { if (!currentUser) return; wishlist = wishlist.filter(item => item !== id); saveUserDataToCloud(); updateCounters(); renderWishlistPage(); renderProducts(); };
 
-function addToCart(id) {
+window.addToCart = function(id) {
     if (!currentUser) { alert("🔒 Please login to add items to your cart!"); return openAuthModal(); }
     const existing = cart.find(item => item.id == id);
     if (existing) existing.qty += 1; else cart.push({ id: id, qty: 1 });
     saveUserDataToCloud(); updateCounters();
     const button = document.activeElement;
     if (button && button.tagName === "BUTTON" && button.textContent.includes("CART")) { const oldText = button.innerHTML; button.innerHTML = "✓ ADDED"; setTimeout(() => { button.innerHTML = oldText; }, 1000); }
-}
+};
 
-function updateCartQty(id, change) {
+window.updateCartQty = function(id, change) {
     if (!currentUser) return;
     const item = cart.find(i => i.id == id);
     if (item) { item.qty += change; if (item.qty <= 0) cart = cart.filter(i => i.id != id); }
     saveUserDataToCloud(); updateCounters(); renderCartPage();
-}
+};
 
-function removeCartItem(id) { if (!currentUser) return; cart = cart.filter(i => i.id != id); saveUserDataToCloud(); updateCounters(); renderCartPage(); }
+window.removeCartItem = function(id) { if (!currentUser) return; cart = cart.filter(i => i.id != id); saveUserDataToCloud(); updateCounters(); renderCartPage(); };
 
 function renderCartPage() {
     const content = document.getElementById("cartPageContent");
+    if (!content) return;
     if (!currentUser) { content.innerHTML = `<div class="fk-empty-cart"><h3>Please login to view your cart!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="openAuthModal()">Login</button></div>`; return; }
     if (cart.length === 0) { content.innerHTML = `<div class="fk-empty-cart"><h3>Your cart is empty!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="showPage('home')">Start Shopping</button></div>`; return; }
 
@@ -424,19 +433,20 @@ function renderCartPage() {
     `;
 }
 
-function proceedToCheckout() {
+window.proceedToCheckout = function() {
     if (!currentUser) return openAuthModal();
     if (cart.length === 0) return alert("Your cart is empty!");
     renderCheckoutSummary(); showPage('checkout');
-}
+};
 
 function renderCheckoutSummary() {
     let totalMRP = 0; let totalDiscountPrice = 0;
     cart.forEach(cartItem => { const product = products.find(p => p.id == cartItem.id); if (product) { totalMRP += product.originalPrice * cartItem.qty; totalDiscountPrice += product.price * cartItem.qty; } });
-    document.getElementById("checkoutSummarySidebar").innerHTML = `<h3>Order Summary</h3><div class="fk-price-row-item"><span>Total MRP</span><span>₹${totalMRP.toLocaleString("en-IN")}</span></div><div class="fk-price-row-item total"><span>Payable Amount</span><span>₹${totalDiscountPrice.toLocaleString("en-IN")}</span></div>`;
+    const sbar = document.getElementById("checkoutSummarySidebar");
+    if(sbar) sbar.innerHTML = `<h3>Order Summary</h3><div class="fk-price-row-item"><span>Total MRP</span><span>₹${totalMRP.toLocaleString("en-IN")}</span></div><div class="fk-price-row-item total"><span>Payable Amount</span><span>₹${totalDiscountPrice.toLocaleString("en-IN")}</span></div>`;
 }
 
-function submitOrder(event) {
+window.submitOrder = function(event) {
     event.preventDefault();
     if (!currentUser) return openAuthModal();
 
@@ -451,11 +461,12 @@ function submitOrder(event) {
     cart = []; 
     saveUserDataToCloud(); 
     updateCounters();
-    document.getElementById("confirmedOrderId").textContent = orderId; 
+    const cId = document.getElementById("confirmedOrderId");
+    if(cId) cId.textContent = orderId; 
     showPage('success');
-}
+};
 
-function cancelOrder(orderId) {
+window.cancelOrder = function(orderId) {
     if (!currentUser) return;
     if (confirm("Are you sure you want to cancel this order?")) {
         const orderIndex = orders.findIndex(o => o.orderId === orderId);
@@ -466,7 +477,7 @@ function cancelOrder(orderId) {
             updateCounters(); 
         }
     }
-}
+};
 
 window.downloadOrderInvoice = function(orderId) {
     const order = orders.find(o => o.orderId === orderId);
@@ -487,6 +498,7 @@ window.downloadOrderInvoice = function(orderId) {
 
 function renderMyOrdersPage() {
     const container = document.getElementById("myOrdersListContainer");
+    if (!container) return;
     if (!currentUser) { container.innerHTML = `<div class="fk-empty-cart"><h3>Please login to view your orders!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="openAuthModal()">Login</button></div>`; return; }
     if (orders.length === 0) { container.innerHTML = `<div class="fk-empty-cart"><h3>No Orders Placed Yet!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="showPage('home')">Start Shopping</button></div>`; return; }
 
@@ -527,16 +539,19 @@ window.toggleMobileMenu = function() {
 };
 
 // =====================================================
-// ADMIN FUNCTIONS MERGED DIRECTLY INTO SINGLE PAGE
+// ADMIN ENGINE MERGED
 // =====================================================
 window.switchAdminTab = function(tab) {
-    document.getElementById("adminTabOrders").style.display = tab === 'orders' ? 'block' : 'none';
-    document.getElementById("adminTabProducts").style.display = tab === 'products' ? 'block' : 'none';
-    document.getElementById("adminTabMeta").style.display = tab === 'meta' ? 'block' : 'none';
+    const oSec = document.getElementById("adminTabOrders");
+    const pSec = document.getElementById("adminTabProducts");
+    const mSec = document.getElementById("adminTabMeta");
+    if(oSec) oSec.style.display = tab === 'orders' ? 'block' : 'none';
+    if(pSec) pSec.style.display = tab === 'products' ? 'block' : 'none';
+    if(mSec) mSec.style.display = tab === 'meta' ? 'block' : 'none';
     
-    document.getElementById("btnTabOrders").style.background = tab === 'orders' ? '#2563eb' : '#334155';
-    document.getElementById("btnTabProducts").style.background = tab === 'products' ? '#2563eb' : '#334155';
-    document.getElementById("btnTabMeta").style.background = tab === 'meta' ? '#2563eb' : '#334155';
+    if(document.getElementById("btnTabOrders")) document.getElementById("btnTabOrders").style.background = tab === 'orders' ? '#2563eb' : '#334155';
+    if(document.getElementById("btnTabProducts")) document.getElementById("btnTabProducts").style.background = tab === 'products' ? '#2563eb' : '#334155';
+    if(document.getElementById("btnTabMeta")) document.getElementById("btnTabMeta").style.background = tab === 'meta' ? '#2563eb' : '#334155';
 
     if(tab === 'orders') loadAdminOrders();
     if(tab === 'products') loadAdminProducts();
@@ -561,8 +576,8 @@ async function loadAdminOrders() {
             }
         });
 
-        document.getElementById("orderCountBadge").textContent = `${allOrders.length} Total Orders`;
-        document.getElementById("statActiveOrders").textContent = activeCount;
+        if(document.getElementById("orderCountBadge")) document.getElementById("orderCountBadge").textContent = `${allOrders.length} Total Orders`;
+        if(document.getElementById("statActiveOrders")) document.getElementById("statActiveOrders").textContent = activeCount;
         allOrders.sort((a, b) => b.orderId.localeCompare(a.orderId));
 
         if (allOrders.length === 0) {
@@ -613,7 +628,7 @@ async function loadAdminProducts() {
         const tbody = document.getElementById("adminProductsTableBody");
         if(!tbody) return;
         querySnapshot.forEach((docSnap) => { cachedProducts.push({ id: docSnap.id, ...docSnap.data() }); });
-        document.getElementById("statTotalProducts").textContent = cachedProducts.length;
+        if(document.getElementById("statTotalProducts")) document.getElementById("statTotalProducts").textContent = cachedProducts.length;
 
         populateAdminDropdowns();
         tbody.innerHTML = cachedProducts.map(p => `<tr><td><strong>${p.name}</strong></td><td>${p.brand} / ${p.category}</td><td>₹${Number(p.price).toLocaleString("en-IN")}</td><td><button class="action-btn edit-btn" onclick="prepareUpdateProduct('${p.id}')">Update</button><button class="action-btn delete-btn" onclick="deleteProduct('${p.id}')">Delete</button></td></tr>`).join("");
@@ -646,17 +661,18 @@ window.prepareUpdateProduct = function(productId) {
     document.getElementById("admOrigPrice").value = p.originalPrice;
     document.getElementById("admImage").value = p.image;
     document.getElementById("admDesc").value = p.description;
-    document.getElementById("formHeading").textContent = "Update Existing Product";
-    document.getElementById("submitProductBtn").textContent = "Save Changes";
-    document.getElementById("cancelEditBtn").style.display = "inline-block";
+    if(document.getElementById("formHeading")) document.getElementById("formHeading").textContent = "Update Existing Product";
+    if(document.getElementById("submitProductBtn")) document.getElementById("submitProductBtn").textContent = "Save Changes";
+    if(document.getElementById("cancelEditBtn")) document.getElementById("cancelEditBtn").style.display = "inline-block";
 };
 
 window.resetProductForm = function() {
-    document.getElementById("productForm").reset();
+    const form = document.getElementById("productForm");
+    if(form) form.reset();
     document.getElementById("editProductId").value = "";
-    document.getElementById("formHeading").textContent = "Add New Product to Firebase Database";
-    document.getElementById("submitProductBtn").textContent = "Upload to Live Store";
-    document.getElementById("cancelEditBtn").style.display = "none";
+    if(document.getElementById("formHeading")) document.getElementById("formHeading").textContent = "Add New Product to Firebase Database";
+    if(document.getElementById("submitProductBtn")) document.getElementById("submitProductBtn").textContent = "Upload to Live Store";
+    if(document.getElementById("cancelEditBtn")) document.getElementById("cancelEditBtn").style.display = "none";
     populateAdminDropdowns();
 };
 
@@ -693,7 +709,7 @@ function loadAdminBrandLogos() {
     const tbody = document.getElementById("adminBrandLogosTable");
     if(!tbody) return;
     const sortedLogos = [...brandLogos].sort((a, b) => a.pos - b.pos);
-    tbody.innerHTML = sortedLogos.map(l => `<tr><td>${l.pos}</td><td><img src="${l.url}" style="height:25px;"></td><td>${l.name}</td><td><button class="action-btn delete-btn" onclick="deleteBrandLogo('${l.name}')">Delete</button></td></tr>`).join("");
+    tbody.innerHTML = sortedLogos.map(l => `<tr><td>${l.pos}</td><td><img src="${l.url}" style="height:25px;" alt="logo"></td><td>${l.name}</td><td><button class="action-btn delete-btn" onclick="deleteBrandLogo('${l.name}')">Delete</button></td></tr>`).join("");
 }
 
 window.toggleMarquee = async function() {
@@ -751,4 +767,3 @@ function scrollToAbout() { showPage('home'); document.getElementById("about").sc
 function scrollToContact() { showPage('home'); document.getElementById("contact").scrollIntoView({ behavior: "smooth" }); }
 function focusSearch() { showPage('home'); const s = document.getElementById("searchInput"); s.focus(); s.scrollIntoView({ behavior: "smooth", block: "center" }); }
 function imageFallback(img) { if (img.dataset.fallbackUsed) return; img.dataset.fallbackUsed = "true"; img.src = "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=900&q=80"; }
-a
