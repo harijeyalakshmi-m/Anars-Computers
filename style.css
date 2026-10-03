@@ -46,6 +46,7 @@ a {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   letter-spacing: 0.5px;
   overflow: hidden;
+  width: 100%;
 }
 .page-view {
   display: none;
@@ -556,7 +557,7 @@ a {
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
 }
 
-/* 🌟 OVERFLOW FIX FOR PRODUCT CARDS 🌟 */
+/* PRODUCT CARDS (OVERFLOW FIX) */
 .product-card {
   position: relative;
   background: white;
@@ -1182,7 +1183,7 @@ a {
   max-width: 90px;
 }
 
-/* MODALS & AUTH (MOBILE RESPONSIVE FIXES) */
+/* MODALS & AUTH */
 .fs-overlay {
   display: none;
   position: fixed;
@@ -1630,17 +1631,78 @@ a {
   margin-top: 12px;
 }
 
+/* =====================================================
+   PROFESSIONAL FOOTER STYLING
+===================================================== */
 .footer {
   background: #0f172a;
   color: #94a3b8;
   padding-top: 60px;
   width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 .footer-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: 40px;
-  padding-bottom: 50px;
+  padding-bottom: 40px;
+}
+.footer-col h4 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.footer-logo {
+  font-size: 22px;
+  font-weight: 800;
+  color: #38bdf8;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+.footer-desc {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #94a3b8;
+  margin-bottom: 18px;
+}
+.footer-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #cbd5e1;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.footer-col a {
+  display: block;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 12px;
+  transition: color 0.2s ease;
+  font-weight: 600;
+}
+.footer-col a:hover {
+  color: #38bdf8;
+  transform: translateX(3px);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 20px 0;
+  background: #090d16;
+}
+.footer-bottom-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: 12px;
+  color: #64748b;
 }
 
 /* RESPONSIVE MEDIA QUERIES */
@@ -1693,6 +1755,14 @@ a {
   }
   .fs-form-box {
     padding: 24px;
+  }
+  .footer-grid {
+    grid-template-columns: 1f;
+    gap: 30px;
+  }
+  .footer-bottom-inner {
+    flex-direction: column;
+    text-align: center;
   }
 }
 
