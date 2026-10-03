@@ -195,11 +195,10 @@ function renderBrandLogosFrontEnd() {
     let html = sortedLogos.map(l => `<div class="brand-logo-item" title="${l.name}"><img src="${l.url}" alt="${l.name}" width="120" height="40" loading="lazy"></div>`).join("");
     
     if (isMarqueeEnabled) { 
-        trackWrapper.innerHTML = `<div class="brand-track-inner">${html}</div><div class="brand-track-inner">${html}</div>`; 
-        trackWrapper.className = "brand-track marquee-active"; 
+        trackWrapper.innerHTML = `<div class="brand-track brand-track-inner">${html}${html}</div>`; 
+        trackWrapper.className = "brand-track-wrapper brand-track marquee-active"; 
     } else { 
-        trackWrapper.innerHTML = html; 
-        trackWrapper.className = "brand-track static"; 
+        trackWrapper.innerHTML = `<div class="brand-track static">${html}</div>`; 
     }
 }
 
@@ -767,3 +766,4 @@ function scrollToAbout() { showPage('home'); document.getElementById("about").sc
 function scrollToContact() { showPage('home'); document.getElementById("contact").scrollIntoView({ behavior: "smooth" }); }
 function focusSearch() { showPage('home'); const s = document.getElementById("searchInput"); s.focus(); s.scrollIntoView({ behavior: "smooth", block: "center" }); }
 function imageFallback(img) { if (img.dataset.fallbackUsed) return; img.dataset.fallbackUsed = "true"; img.src = "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=900&q=80"; }
+a
