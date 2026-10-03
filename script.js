@@ -36,10 +36,74 @@ document.addEventListener("DOMContentLoaded", async function () {
     }, { threshold: 0.1 });
     document.querySelectorAll('.reveal, .reveal-zoom').forEach((el) => { observer.observe(el); });
 
+    attachEventListeners();
     await loadStoreMetadata();
     await loadProductsFromFirebase();
     setupHeroSlider();
 });
+
+// SAFE EVENT LISTENERS BINDING TO AVOID UNDEFINED ERROR
+function attachEventListeners() {
+    const bindClick = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener("click", fn); };
+
+    bindClick("hamburgerToggleBtn", toggleMobileMenu);
+    bindClick("logoHomeLink", () => showPage('home'));
+    bindClick("navHomeLink", () => showPage('home'));
+    bindClick("navProductsLink", scrollToProducts);
+    bindClick("navCategoriesLink", scrollToCategories);
+    bindClick("navOrdersLink", () => showPage('orders'));
+    bindClick("navAboutLink", scrollToAbout);
+    bindClick("navContactLink", scrollToContact);
+
+    bindClick("headerSearchBtn", focusSearch);
+    bindClick("headerOrdersBtn", () => showPage('orders'));
+    bindClick("headerWishlistBtn", () => showPage('wishlist'));
+    bindClick("headerCartBtn", () => showPage('cart'));
+
+    bindClick("heroExploreBtn", scrollToProducts);
+    bindClick("heroLaptopsBtn", () => filterCategory('Laptops'));
+    bindClick("sliderPrevBtn", () => changeSlide(-1));
+    bindClick("sliderNextBtn", () => changeSlide(1));
+
+    document.querySelectorAll("#sliderDotsContainer .dot").forEach(dot => {
+        dot.addEventListener("click", () => goToSlide(Number(dot.dataset.index)));
+    });
+
+    bindClick("searchActionBtn", searchProducts);
+    bindClick("viewAllProductsBtn", showAllProducts);
+    bindClick("noProductsViewAllBtn", showAllProducts);
+
+    bindClick("backToStoreDetailBtn", () => showPage('home'));
+    bindClick("backToStoreCartBtn", () => showPage('home'));
+    bindClick("backToStoreWishlistBtn", () => showPage('home'));
+    bindClick("backToCartCheckoutBtn", () => showPage('cart'));
+    bindClick("successReturnStoreBtn", () => showPage('home'));
+    bindClick("backToStoreOrdersBtn", () => showPage('home'));
+    bindClick("backToStoreAdminBtn", () => showPage('home'));
+
+    bindClick("sidebarHomeLink", () => { showPage('home'); toggleMobileMenu(); });
+    bindClick("sidebarProductsLink", () => { scrollToProducts(); toggleMobileMenu(); });
+    bindClick("sidebarCategoriesLink", () => { scrollToCategories(); toggleMobileMenu(); });
+    bindClick("sidebarOrdersLink", () => { showPage('orders'); toggleMobileMenu(); });
+    bindClick("sidebarWishlistLink", () => { showPage('wishlist'); toggleMobileMenu(); });
+    bindClick("sidebarCartLink", () => { showPage('cart'); toggleMobileMenu(); });
+    bindClick("sidebarAboutLink", () => { scrollToAbout(); toggleMobileMenu(); });
+    bindClick("sidebarContactLink", () => { scrollToContact(); toggleMobileMenu(); });
+
+    bindClick("bottomNavHome", () => showPage('home'));
+    bindClick("bottomNavProducts", scrollToProducts);
+    bindClick("bottomNavOrders", () => showPage('orders'));
+    bindClick("bottomNavCart", () => showPage('cart'));
+
+    bindClick("footerHomeLink", () => showPage('home'));
+    bindClick("footerProductsLink", scrollToProducts);
+    bindClick("footerCategoriesLink", scrollToCategories);
+    bindClick("footerAboutLink", scrollToAbout);
+    bindClick("footerContactLink", scrollToContact);
+    bindClick("footerOrdersLink", () => showPage('orders'));
+    bindClick("footerCartLink", () => showPage('cart'));
+    bindClick("footerWishlistLink", () => showPage('wishlist'));
+}
 
 onAuthStateChanged(auth, async (user) => {
     currentUser = user;
@@ -69,7 +133,7 @@ onAuthStateChanged(auth, async (user) => {
                 </button>
                 <div id="profileDropdownMenu" class="profile-dropdown-menu">
                     <button onclick="openAccountModal()">My Profile</button>
-                    ${isAdmin ? `<button onclick="showPage('admin')" style="color:#16a34a; font-weight:800;">⚙️ Admin Dashboard</button>` : ''}
+                    ${isAdmin ? `<button onclick="showPage('admin')" style="color:#16a34a; font-weight:800;">⚙️️ Admin Dashboard</button>` : ''}
                     <button onclick="handleLogout()" style="color:#dc2626;">Logout</button>
                 </div>
             `;
@@ -561,7 +625,7 @@ function renderMyOrdersPage() {
     }).join("");
 }
 
-window.updateCounters = function () {
+function updateCounters() {
     const ordersLen = orders.filter(o => o.statusIndex !== 0).length;
     const cartLen = cart.reduce((sum, item) => sum + item.qty, 0);
     const wishLen = wishlist.length;
@@ -573,7 +637,7 @@ window.updateCounters = function () {
     if (document.getElementById("sidebarWishlistCount")) document.getElementById("sidebarWishlistCount").textContent = wishLen;
     if (document.getElementById("sidebarCartCount")) document.getElementById("sidebarCartCount").textContent = cartLen;
     if (document.getElementById("sidebarOrdersCount")) document.getElementById("sidebarOrdersCount").textContent = ordersLen;
-};
+}
 
 window.toggleMobileMenu = function () {
     const sidebar = document.getElementById("mobileMenuSidebar");
@@ -581,14 +645,8 @@ window.toggleMobileMenu = function () {
     if (sidebar && overlay) { sidebar.classList.toggle("active"); overlay.classList.toggle("active"); }
 };
 
-window.scrollToProducts = function () { showPage('home'); const p = document.getElementById("products"); if (p) p.scrollIntoView({ behavior: "smooth" }); };
-window.scrollToCategories = function () { showPage('home'); const c = document.getElementById("categories"); if (c) c.scrollIntoView({ behavior: "smooth" }); };
-window.scrollToAbout = function () { showPage('home'); const a = document.getElementById("about"); if (a) a.scrollIntoView({ behavior: "smooth" }); };
-window.scrollToContact = function () { showPage('home'); const c = document.getElementById("contact"); if (c) c.scrollIntoView({ behavior: "smooth" }); };
-window.focusSearch = function () { showPage('home'); const s = document.getElementById("searchInput"); if (s) { s.focus(); s.scrollIntoView({ behavior: "smooth", block: "center" }); } };
-
 // =====================================================
-// ADMIN ENGINE MERGED
+// ADMIN ENGINE MERGED (REAL-TIME GLOBAL FIREBASE SYNC)
 // =====================================================
 window.switchAdminTab = function (tab) {
     const oSec = document.getElementById("adminTabOrders");
@@ -818,4 +876,9 @@ function goToSlide(index) {
     slides[currentSlide].classList.add("active"); dots[currentSlide].classList.add("active");
 }
 
+function scrollToProducts() { showPage('home'); document.getElementById("products").scrollIntoView({ behavior: "smooth" }); }
+function scrollToCategories() { showPage('home'); document.getElementById("categories").scrollIntoView({ behavior: "smooth" }); }
+function scrollToAbout() { showPage('home'); document.getElementById("about").scrollIntoView({ behavior: "smooth" }); }
+function scrollToContact() { showPage('home'); document.getElementById("contact").scrollIntoView({ behavior: "smooth" }); }
+function focusSearch() { showPage('home'); const s = document.getElementById("searchInput"); s.focus(); s.scrollIntoView({ behavior: "smooth", block: "center" }); }
 function imageFallback(img) { if (img.dataset.fallbackUsed) return; img.dataset.fallbackUsed = "true"; img.src = "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=900&q=80"; }
