@@ -304,4 +304,451 @@ function openProductDetail(id) {
             </div>
         </div>
         <div class="admin-card" style="margin-top: 30px; background:white; padding:30px; border-radius:16px; border:1px solid #e2e8f0;">
-            <h3 style="font-size:18px; font-weight:800; color:
+            <h3 style="font-size:18px; font-weight:800; color:#0f172a; margin-bottom:15px;">Customer Reviews & Ratings</h3>
+            <div style="max-height: 250px; overflow-y:auto; margin-bottom:20px;">${reviewsHtml}</div>
+            <h4 style="font-size:14px; font-weight:700; color:#334155; margin-bottom:10px;">Write a Review</h4>
+            <form onsubmit="submitProductReview(event, '${product.id}')" style="display:flex; flex-direction:column; gap:12px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"><input type="text" id="revName" placeholder="Your Name" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px;"><select id="revRating" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; font-weight:600;"><option value="5">5 Stars - Excellent</option><option value="4">4 Stars - Very Good</option><option value="3">3 Stars - Good</option></select></div>
+                <textarea id="revComment" placeholder="Write your feedback..." rows="3" required style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none; font-family:inherit;"></textarea>
+                <button type="submit" class="primary-btn" style="width:max-content; padding:10px 20px;">Post Review</button>
+            </form>
+        </div>
+    `;
+    showPage('detail');
+}
+
+window.submitProductReview = function(event, productId) {
+    event.preventDefault();
+    if (!currentUser) { alert("🔒 Please login to post a review!"); return openAuthModal(); }
+    const name = document.getElementById("revName").value.trim();
+    const rating = Number(document.getElementById("revRating").value);
+    const comment = document.getElementById("revComment").value.trim();
+    if (!productReviews[productId]) productReviews[productId] = [];
+    productReviews[productId].unshift({ name, rating, comment });
+    localStorage.setItem("anarsProductReviews", JSON.stringify(productReviews));
+    alert("Review submitted successfully!"); openProductDetail(productId);
+};
+
+function toggleWishlist(id) {
+    if (!currentUser) { alert("🔒 Please login to save items to your wishlist!"); return openAuthModal(); }
+    if (wishlist.includes(id)) wishlist = wishlist.filter(item => item !== id); else wishlist.push(id);
+    saveUserDataToCloud(); updateCounters(); renderProducts();
+    if (document.getElementById("wishlistPage").classList.contains("active")) renderWishlistPage();
+}
+
+function renderWishlistPage() {
+    const content = document.getElementById("wishlistPageContent");
+    if (!currentUser) { content.innerHTML = `<div class="fk-empty-cart"><h3>Please login to view your wishlist!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="openAuthModal()">Login</button></div>`; return; }
+    const items = wishlist.map(id => products.find(product => product.id == id)).filter(Boolean);
+    if (items.length === 0) { content.innerHTML = `<div class="fk-empty-cart"><h3>Your wishlist is empty!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="showPage('home')">Browse Store</button></div>`; return; }
+    
+    content.innerHTML = items.map(product => {
+        const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+        return `
+        <div class="fk-cart-item-card">
+            <div class="fk-cart-img-wrapper" style="border:none; padding:0; margin:0;"><img src="${product.image}" alt="${product.name}" class="fk-cart-item-img" onerror="imageFallback(this)" loading="lazy" width="120" height="120"></div>
+            <div class="fk-cart-item-details">
+                <h4 onclick="openProductDetail('${product.id}')">${product.name}</h4>
+                <div class="seller">Seller: Anars Computers • ${product.brand}</div>
+                <div class="fk-cart-price-row"><span class="fk-cart-price">₹${Number(product.price).toLocaleString("en-IN")}</span><span class="fk-cart-mrp">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span><span class="fk-cart-discount">${discount}% Off</span></div>
+                <div class="fk-action-links">
+                    <button onclick="removeWishlist('${product.id}')" class="fk-text-btn text-danger" style="color:#dc2626;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> REMOVE</button>
+                    <button onclick="addToCart('${product.id}'); removeWishlist('${product.id}');" class="fk-text-btn" style="color:#2563eb;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg> MOVE TO CART</button>
+                </div>
+            </div>
+        </div>
+    `}).join("");
+}
+
+function removeWishlist(id) { if (!currentUser) return; wishlist = wishlist.filter(item => item !== id); saveUserDataToCloud(); updateCounters(); renderWishlistPage(); renderProducts(); }
+
+function addToCart(id) {
+    if (!currentUser) { alert("🔒 Please login to add items to your cart!"); return openAuthModal(); }
+    const existing = cart.find(item => item.id == id);
+    if (existing) existing.qty += 1; else cart.push({ id: id, qty: 1 });
+    saveUserDataToCloud(); updateCounters();
+    const button = document.activeElement;
+    if (button && button.tagName === "BUTTON" && button.textContent.includes("CART")) { const oldText = button.innerHTML; button.innerHTML = "✓ ADDED"; setTimeout(() => { button.innerHTML = oldText; }, 1000); }
+}
+
+function updateCartQty(id, change) {
+    if (!currentUser) return;
+    const item = cart.find(i => i.id == id);
+    if (item) { item.qty += change; if (item.qty <= 0) cart = cart.filter(i => i.id != id); }
+    saveUserDataToCloud(); updateCounters(); renderCartPage();
+}
+
+function removeCartItem(id) { if (!currentUser) return; cart = cart.filter(i => i.id != id); saveUserDataToCloud(); updateCounters(); renderCartPage(); }
+
+function renderCartPage() {
+    const content = document.getElementById("cartPageContent");
+    if (!currentUser) { content.innerHTML = `<div class="fk-empty-cart"><h3>Please login to view your cart!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="openAuthModal()">Login</button></div>`; return; }
+    if (cart.length === 0) { content.innerHTML = `<div class="fk-empty-cart"><h3>Your cart is empty!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="showPage('home')">Start Shopping</button></div>`; return; }
+
+    let totalMRP = 0; let totalDiscountPrice = 0;
+    let itemsHTML = cart.map(cartItem => {
+        const product = products.find(p => p.id == cartItem.id);
+        if (!product) return "";
+        totalMRP += product.originalPrice * cartItem.qty; totalDiscountPrice += product.price * cartItem.qty;
+        const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+
+        return `
+            <div class="fk-cart-item-card">
+                <div class="fk-cart-img-wrapper">
+                    <img src="${product.image}" alt="${product.name}" class="fk-cart-item-img" onerror="imageFallback(this)" loading="lazy" width="120" height="120">
+                    <div class="fk-qty-controls"><button onclick="updateCartQty('${product.id}', -1)" aria-label="Decrease Quantity">-</button><span>${cartItem.qty}</span><button onclick="updateCartQty('${product.id}', 1)" aria-label="Increase Quantity">+</button></div>
+                </div>
+                <div class="fk-cart-item-details">
+                    <h4 onclick="openProductDetail('${product.id}')">${product.name}</h4><div class="seller">Seller: Anars Computers</div>
+                    <div class="fk-cart-price-row"><span class="fk-cart-price">₹${Number(product.price).toLocaleString("en-IN")}</span><span class="fk-cart-mrp">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span><span class="fk-cart-discount">${discount}% Off</span></div>
+                    <div class="fk-action-links"><button onclick="removeCartItem('${product.id}')" class="fk-text-btn" style="color:#dc2626;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> REMOVE</button></div>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    const savings = totalMRP - totalDiscountPrice;
+    content.innerHTML = `
+        <div class="fk-cart-layout">
+            <div class="fk-cart-items-list">${itemsHTML}</div>
+            <div class="fk-price-sidebar">
+                <h3>Order Summary</h3>
+                <div class="fk-price-row-item"><span>Price (${cart.length} items)</span><span>₹${totalMRP.toLocaleString("en-IN")}</span></div>
+                <div class="fk-price-row-item"><span>Store Discount</span><span style="color:#16a34a;">- ₹${savings.toLocaleString("en-IN")}</span></div>
+                <div class="fk-price-row-item"><span>Delivery Charges</span><span style="color:#16a34a;">Free Delivery</span></div>
+                <div class="fk-price-row-item total"><span>Total Amount</span><span>₹${totalDiscountPrice.toLocaleString("en-IN")}</span></div>
+                <div class="fk-savings-banner">You will save ₹${savings.toLocaleString("en-IN")} on this order</div>
+                <button class="fk-place-order-btn" onclick="proceedToCheckout()">PLACE ORDER</button>
+            </div>
+        </div>
+    `;
+}
+
+function proceedToCheckout() {
+    if (!currentUser) return openAuthModal();
+    if (cart.length === 0) return alert("Your cart is empty!");
+    renderCheckoutSummary(); showPage('checkout');
+}
+
+function renderCheckoutSummary() {
+    let totalMRP = 0; let totalDiscountPrice = 0;
+    cart.forEach(cartItem => { const product = products.find(p => p.id == cartItem.id); if (product) { totalMRP += product.originalPrice * cartItem.qty; totalDiscountPrice += product.price * cartItem.qty; } });
+    document.getElementById("checkoutSummarySidebar").innerHTML = `<h3>Order Summary</h3><div class="fk-price-row-item"><span>Total MRP</span><span>₹${totalMRP.toLocaleString("en-IN")}</span></div><div class="fk-price-row-item total"><span>Payable Amount</span><span>₹${totalDiscountPrice.toLocaleString("en-IN")}</span></div>`;
+}
+
+function submitOrder(event) {
+    event.preventDefault();
+    if (!currentUser) return openAuthModal();
+
+    const name = document.getElementById("shipName").value.trim();
+    const phone = document.getElementById("shipPhone").value.trim();
+    const address = document.getElementById("shipAddress").value.trim();
+    const orderId = "ANARS-" + Math.floor(1000 + Math.random() * 9000);
+
+    const newOrder = { orderId, date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }), name, phone, address, items: [...cart], statusIndex: 1 };
+    
+    orders.unshift(newOrder); 
+    cart = []; 
+    saveUserDataToCloud(); 
+    updateCounters();
+    document.getElementById("confirmedOrderId").textContent = orderId; 
+    showPage('success');
+}
+
+function cancelOrder(orderId) {
+    if (!currentUser) return;
+    if (confirm("Are you sure you want to cancel this order?")) {
+        const orderIndex = orders.findIndex(o => o.orderId === orderId);
+        if (orderIndex > -1) { 
+            orders[orderIndex].statusIndex = 0; 
+            saveUserDataToCloud(); 
+            renderMyOrdersPage(); 
+            updateCounters(); 
+        }
+    }
+}
+
+window.downloadOrderInvoice = function(orderId) {
+    const order = orders.find(o => o.orderId === orderId);
+    if (!order) return;
+    let subtotal = 0;
+    let itemsRows = order.items.map(ci => {
+        const p = products.find(prod => prod.id == ci.id);
+        const name = p ? p.name : "Computer Hardware";
+        const price = p ? p.price : 0;
+        const total = price * ci.qty; subtotal += total;
+        return `<tr><td style="padding:10px; border-bottom:1px solid #e2e8f0;">${name}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:center;">${ci.qty}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:right;">₹${price.toLocaleString("en-IN")}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; text-align:right;">₹${total.toLocaleString("en-IN")}</td></tr>`;
+    }).join("");
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`<html><head><title>Invoice - #${order.orderId}</title><style>body{font-family:'Plus Jakarta Sans',sans-serif;padding:40px;color:#0f172a;}.invoice-box{max-width:800px;margin:auto;border:1px solid #cbd5e1;padding:40px;border-radius:8px;}.header{display:flex;justify-content:space-between;border-bottom:2px solid #0f172a;padding-bottom:20px;margin-bottom:20px;}.store-name{font-size:24px;font-weight:900;color:#1e3a8a;}table{width:100%;border-collapse:collapse;margin-top:20px;}th{background:#f8fafc;padding:12px;text-align:left;font-size:12px;border-bottom:2px solid #cbd5e1;}.total-row{font-size:16px;font-weight:800;text-align:right;margin-top:20px;}</style></head><body><div class="invoice-box"><div class="header"><div><div class="store-name">ANARS COMPUTERS</div><p style="font-size:12px;color:#64748b;">Annai Complex, Kuthukalvalasai, TN 627803</p></div><div style="text-align:right;"><h2>TAX INVOICE</h2><p style="font-size:12px;color:#64748b;">Order ID: #${order.orderId}<br>Date: ${order.date}</p></div></div><div style="margin-bottom:20px;font-size:13px;"><strong>Billed To:</strong><br>${order.name} (${order.phone})<br>${order.address}, Kuthukalvalasai, TN</div><table><thead><tr><th>Item</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Price</th><th style="text-align:right;">Total</th></tr></thead><tbody>${itemsRows}</tbody></table><div class="total-row">Grand Total: ₹${subtotal.toLocaleString("en-IN")}</div></div><script>window.print();</script></body></html>`);
+    printWindow.document.close();
+};
+
+function renderMyOrdersPage() {
+    const container = document.getElementById("myOrdersListContainer");
+    if (!currentUser) { container.innerHTML = `<div class="fk-empty-cart"><h3>Please login to view your orders!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="openAuthModal()">Login</button></div>`; return; }
+    if (orders.length === 0) { container.innerHTML = `<div class="fk-empty-cart"><h3>No Orders Placed Yet!</h3><button class="primary-btn" style="margin:20px auto 0;" onclick="showPage('home')">Start Shopping</button></div>`; return; }
+
+    container.innerHTML = orders.map(order => {
+        let itemsHtml = order.items.map(cartItem => {
+            const product = products.find(p => p.id == cartItem.id);
+            if (!product) return "";
+            return `<div class="order-item-row"><img src="${product.image}" class="order-item-img" onerror="imageFallback(this)" loading="lazy" width="70" height="70"><div style="flex:1;"><h4 style="font-size:15px; font-weight:700;">${product.name}</h4><p style="font-size:13px; color:#64748b;">Qty: ${cartItem.qty} | Price: ₹${Number(product.price).toLocaleString("en-IN")}</p></div></div>`;
+        }).join("");
+
+        const s = order.statusIndex;
+        let statusText = s === 0 ? "Cancelled" : s === 1 ? "Order Placed" : s === 2 ? "Packed at Store" : s === 3 ? "Out for Delivery" : "Delivered";
+        let statusColor = s === 0 ? "#ef4444" : s === 4 ? "#16a34a" : "#2563eb"; let statusBg = s === 0 ? "#fee2e2" : s === 4 ? "#dcfce7" : "#dbeafe";
+        let cancelBtnHtml = s === 1 ? `<button class="cancel-order-btn" onclick="cancelOrder('${order.orderId}')">Cancel Order</button>` : '';
+
+        return `<div class="order-card-box ${s === 0 ? 'cancelled-order' : ''}"><div class="order-top-row"><div><span class="order-id-badge">Order ID: #${order.orderId}</span><span style="font-size:12px; color:#64748b; margin-left:12px;">Placed on: ${order.date}</span></div><div style="display:flex; align-items:center; gap:12px;"><span style="font-size:13px; font-weight:700; color:${statusColor}; background:${statusBg}; padding:4px 10px; border-radius:6px;">Status: ${statusText}</span><button class="details-btn" onclick="downloadOrderInvoice('${order.orderId}')" style="padding:6px 12px; border-radius:6px; font-size:11px; font-weight:700;">Download Invoice 📄</button>${cancelBtnHtml}</div></div><div class="order-items-grid">${itemsHtml}</div><div style="font-size:13px; color:#334155; margin-bottom:20px; background:#f8fafc; padding:12px 16px; border-radius:8px; border:1px solid #e2e8f0;"><strong>Shipping Address:</strong> ${order.address}, Kuthukalvalasai, TN - 627803 &nbsp;|&nbsp; <strong>Phone:</strong> ${order.phone}</div>${s === 0 ? `<div style="background:#fee2e2; color:#b91c1c; padding:12px; border-radius:8px; font-size:13px; font-weight:700; text-align:center;">This order has been cancelled successfully.</div>` : `<div class="visual-timeline"><div class="v-step ${s >= 1 ? 'active' : ''}"><div class="v-dot">${s > 1 ? '✓' : '1'}</div><span>Order Placed</span></div><div class="v-step ${s >= 2 ? 'active' : ''}"><div class="v-dot">${s > 2 ? '✓' : '2'}</div><span>Packed</span></div><div class="v-step ${s >= 3 ? 'active' : ''}"><div class="v-dot">${s > 3 ? '✓' : '3'}</div><span>Out for Delivery</span></div><div class="v-step ${s >= 4 ? 'active' : ''}"><div class="v-dot">✓</div><span>Delivered</span></div></div>`}</div>`;
+    }).join("");
+}
+
+function updateCounters() {
+    const ordersLen = orders.filter(o => o.statusIndex !== 0).length;
+    const cartLen = cart.reduce((sum, item) => sum + item.qty, 0);
+    const wishLen = wishlist.length;
+
+    if(document.getElementById("wishlistCount")) document.getElementById("wishlistCount").textContent = wishLen;
+    if(document.getElementById("cartCount")) document.getElementById("cartCount").textContent = cartLen;
+    if(document.getElementById("ordersCount")) document.getElementById("ordersCount").textContent = ordersLen;
+
+    if(document.getElementById("sidebarWishlistCount")) document.getElementById("sidebarWishlistCount").textContent = wishLen;
+    if(document.getElementById("sidebarCartCount")) document.getElementById("sidebarCartCount").textContent = cartLen;
+    if(document.getElementById("sidebarOrdersCount")) document.getElementById("sidebarOrdersCount").textContent = ordersLen;
+}
+
+window.toggleMobileMenu = function() {
+    const sidebar = document.getElementById("mobileMenuSidebar");
+    const overlay = document.getElementById("mobileMenuOverlay");
+    if(sidebar && overlay) { sidebar.classList.toggle("active"); overlay.classList.toggle("active"); }
+};
+
+// =====================================================
+// ADMIN FUNCTIONS MERGED DIRECTLY INTO SINGLE PAGE
+// =====================================================
+window.switchAdminTab = function(tab) {
+    document.getElementById("adminTabOrders").style.display = tab === 'orders' ? 'block' : 'none';
+    document.getElementById("adminTabProducts").style.display = tab === 'products' ? 'block' : 'none';
+    document.getElementById("adminTabMeta").style.display = tab === 'meta' ? 'block' : 'none';
+    
+    document.getElementById("btnTabOrders").style.background = tab === 'orders' ? '#2563eb' : '#334155';
+    document.getElementById("btnTabProducts").style.background = tab === 'products' ? '#2563eb' : '#334155';
+    document.getElementById("btnTabMeta").style.background = tab === 'meta' ? '#2563eb' : '#334155';
+
+    if(tab === 'orders') loadAdminOrders();
+    if(tab === 'products') loadAdminProducts();
+    if(tab === 'meta') loadAdminBrandLogos();
+};
+
+async function loadAdminOrders() {
+    const tbody = document.getElementById("adminOrdersTableBody");
+    if (!tbody) return;
+    let allOrders = [];
+    let activeCount = 0;
+
+    try {
+        const usersSnap = await getDocs(collection(db, "users"));
+        usersSnap.forEach(userDoc => {
+            const userData = userDoc.data();
+            if (userData.orders && userData.orders.length > 0) {
+                userData.orders.forEach((order, index) => {
+                    allOrders.push({ ...order, uid: userDoc.id, orderIndex: index });
+                    if (order.statusIndex !== 0) activeCount++;
+                });
+            }
+        });
+
+        document.getElementById("orderCountBadge").textContent = `${allOrders.length} Total Orders`;
+        document.getElementById("statActiveOrders").textContent = activeCount;
+        allOrders.sort((a, b) => b.orderId.localeCompare(a.orderId));
+
+        if (allOrders.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b; padding:30px;">No customer orders placed yet.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = allOrders.map((order) => {
+            const s = order.statusIndex;
+            const itemsList = order.items.map(i => `Qty: ${i.qty}`).join(", ");
+            return `<tr>
+                <td><strong>#${order.orderId}</strong><br><span style="font-size:11px; color:#64748b;">${order.date}</span></td>
+                <td><strong>${order.name}</strong><br><span style="font-size:11px; color:#64748b;">Phone: ${order.phone}</span></td>
+                <td style="font-size:12px; color:#334155;">${order.address}, Kuthukalvalasai</td>
+                <td>${itemsList}</td>
+                <td>
+                    <select class="status-select" onchange="updateAdminOrderStatus('${order.uid}', ${order.orderIndex}, this.value)">
+                        <option value="1" ${s === 1 ? 'selected' : ''}>1. Order Placed</option>
+                        <option value="2" ${s === 2 ? 'selected' : ''}>2. Packed at Store</option>
+                        <option value="3" ${s === 3 ? 'selected' : ''}>3. Out for Delivery</option>
+                        <option value="4" ${s === 4 ? 'selected' : ''}>4. Delivered</option>
+                        <option value="0" ${s === 0 ? 'selected' : ''}>Cancelled</option>
+                    </select>
+                </td>
+            </tr>`;
+        }).join("");
+    } catch (e) { console.error("Error loading admin orders:", e); }
+}
+
+window.updateAdminOrderStatus = async function (uid, orderIndex, newStatus) {
+    try {
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            let userData = userSnap.data();
+            userData.orders[orderIndex].statusIndex = Number(newStatus);
+            await updateDoc(userRef, { orders: userData.orders });
+            alert("Order status updated in Live Database!");
+            loadAdminOrders();
+        }
+    } catch (e) { alert("Failed to update status."); }
+};
+
+async function loadAdminProducts() {
+    try {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        cachedProducts = [];
+        const tbody = document.getElementById("adminProductsTableBody");
+        if(!tbody) return;
+        querySnapshot.forEach((docSnap) => { cachedProducts.push({ id: docSnap.id, ...docSnap.data() }); });
+        document.getElementById("statTotalProducts").textContent = cachedProducts.length;
+
+        populateAdminDropdowns();
+        tbody.innerHTML = cachedProducts.map(p => `<tr><td><strong>${p.name}</strong></td><td>${p.brand} / ${p.category}</td><td>₹${Number(p.price).toLocaleString("en-IN")}</td><td><button class="action-btn edit-btn" onclick="prepareUpdateProduct('${p.id}')">Update</button><button class="action-btn delete-btn" onclick="deleteProduct('${p.id}')">Delete</button></td></tr>`).join("");
+    } catch (e) { console.error(e); }
+}
+
+function populateAdminDropdowns(selectedBrand = "", selectedCategory = "") {
+    const brandSelect = document.getElementById("admBrandSelect");
+    const catSelect = document.getElementById("admCategorySelect");
+    if(!brandSelect || !catSelect) return;
+    brandSelect.innerHTML = `<option value="">Select Brand</option>` + storeBrands.map(b => `<option value="${b}" ${b === selectedBrand ? 'selected' : ''}>${b}</option>`).join("");
+    catSelect.innerHTML = `<option value="">Select Category</option>` + storeCategories.map(c => `<option value="${c}" ${c === selectedCategory ? 'selected' : ''}>${c}</option>`).join("");
+}
+
+window.deleteProduct = async function(productId) {
+    if(confirm("Delete this product?")) {
+        await deleteDoc(doc(db, "products", productId));
+        loadAdminProducts();
+        loadProductsFromFirebase();
+    }
+};
+
+window.prepareUpdateProduct = function(productId) {
+    const p = cachedProducts.find(item => item.id === productId);
+    if(!p) return;
+    document.getElementById("editProductId").value = p.id;
+    document.getElementById("admName").value = p.name;
+    populateAdminDropdowns(p.brand, p.category);
+    document.getElementById("admPrice").value = p.price;
+    document.getElementById("admOrigPrice").value = p.originalPrice;
+    document.getElementById("admImage").value = p.image;
+    document.getElementById("admDesc").value = p.description;
+    document.getElementById("formHeading").textContent = "Update Existing Product";
+    document.getElementById("submitProductBtn").textContent = "Save Changes";
+    document.getElementById("cancelEditBtn").style.display = "inline-block";
+};
+
+window.resetProductForm = function() {
+    document.getElementById("productForm").reset();
+    document.getElementById("editProductId").value = "";
+    document.getElementById("formHeading").textContent = "Add New Product to Firebase Database";
+    document.getElementById("submitProductBtn").textContent = "Upload to Live Store";
+    document.getElementById("cancelEditBtn").style.display = "none";
+    populateAdminDropdowns();
+};
+
+const prodForm = document.getElementById("productForm");
+if(prodForm) {
+    prodForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+        const id = document.getElementById("editProductId").value;
+        const data = {
+            name: document.getElementById("admName").value.trim(),
+            brand: document.getElementById("admBrandSelect").value,
+            category: document.getElementById("admCategorySelect").value,
+            price: Number(document.getElementById("admPrice").value),
+            originalPrice: Number(document.getElementById("admOrigPrice").value),
+            image: document.getElementById("admImage").value.trim(),
+            description: document.getElementById("admDesc").value.trim()
+        };
+        if(id) {
+            await updateDoc(doc(db, "products", id), data);
+            alert("Product updated successfully!");
+        } else {
+            await addDoc(collection(db, "products"), data);
+            alert("Product added successfully!");
+        }
+        resetProductForm();
+        loadAdminProducts();
+        loadProductsFromFirebase();
+    });
+}
+
+function loadAdminBrandLogos() {
+    const toggle = document.getElementById("admMarqueeToggle");
+    if(toggle) toggle.checked = isMarqueeEnabled;
+    const tbody = document.getElementById("adminBrandLogosTable");
+    if(!tbody) return;
+    const sortedLogos = [...brandLogos].sort((a, b) => a.pos - b.pos);
+    tbody.innerHTML = sortedLogos.map(l => `<tr><td>${l.pos}</td><td><img src="${l.url}" style="height:25px;"></td><td>${l.name}</td><td><button class="action-btn delete-btn" onclick="deleteBrandLogo('${l.name}')">Delete</button></td></tr>`).join("");
+}
+
+window.toggleMarquee = async function() {
+    isMarqueeEnabled = document.getElementById("admMarqueeToggle").checked;
+    await setDoc(doc(db, "store_metadata", "config"), { brands: storeBrands, categories: storeCategories, brandLogos, isMarqueeEnabled, uiTheme }, { merge: true });
+    renderBrandLogosFrontEnd();
+};
+
+window.addBrandLogo = async function() {
+    const name = document.getElementById("logoName").value.trim();
+    const url = document.getElementById("logoUrl").value.trim();
+    const pos = Number(document.getElementById("logoPos").value);
+    if(!name || !url) return alert("Fill name & URL");
+    brandLogos.push({ name, url, pos });
+    await setDoc(doc(db, "store_metadata", "config"), { brands: storeBrands, categories: storeCategories, brandLogos, isMarqueeEnabled, uiTheme }, { merge: true });
+    loadAdminBrandLogos();
+    renderBrandLogosFrontEnd();
+    alert("Logo added!");
+};
+
+window.deleteBrandLogo = async function(name) {
+    brandLogos = brandLogos.filter(l => l.name !== name);
+    await setDoc(doc(db, "store_metadata", "config"), { brands: storeBrands, categories: storeCategories, brandLogos, isMarqueeEnabled, uiTheme }, { merge: true });
+    loadAdminBrandLogos();
+    renderBrandLogosFrontEnd();
+};
+
+window.updateUITheme = async function(val) {
+    uiTheme = val;
+    document.body.setAttribute('data-theme', uiTheme);
+    await setDoc(doc(db, "store_metadata", "config"), { brands: storeBrands, categories: storeCategories, brandLogos, isMarqueeEnabled, uiTheme }, { merge: true });
+    alert("Theme updated to " + val);
+};
+
+function setupHeroSlider() { setInterval(() => { changeSlide(1); }, 5000); }
+function changeSlide(direction) {
+    const slides = document.querySelectorAll(".hero-slide"); const dots = document.querySelectorAll(".dot");
+    if (!slides.length) return;
+    slides[currentSlide].classList.remove("active"); dots[currentSlide].classList.remove("active");
+    currentSlide += direction;
+    if (currentSlide >= slides.length) currentSlide = 0; if (currentSlide < 0) currentSlide = slides.length - 1;
+    slides[currentSlide].classList.add("active"); dots[currentSlide].classList.add("active");
+}
+function goToSlide(index) {
+    const slides = document.querySelectorAll(".hero-slide"); const dots = document.querySelectorAll(".dot");
+    if (!slides[index]) return;
+    slides[currentSlide].classList.remove("active"); dots[currentSlide].classList.remove("active");
+    currentSlide = index;
+    slides[currentSlide].classList.add("active"); dots[currentSlide].classList.add("active");
+}
+
+function scrollToProducts() { showPage('home'); document.getElementById("products").scrollIntoView({ behavior: "smooth" }); }
+function scrollToCategories() { showPage('home'); document.getElementById("categories").scrollIntoView({ behavior: "smooth" }); }
+function scrollToAbout() { showPage('home'); document.getElementById("about").scrollIntoView({ behavior: "smooth" }); }
+function scrollToContact() { showPage('home'); document.getElementById("contact").scrollIntoView({ behavior: "smooth" }); }
+function focusSearch() { showPage('home'); const s = document.getElementById("searchInput"); s.focus(); s.scrollIntoView({ behavior: "smooth", block: "center" }); }
+function imageFallback(img) { if (img.dataset.fallbackUsed) return; img.dataset.fallbackUsed = "true"; img.src = "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=900&q=80"; }
+a
