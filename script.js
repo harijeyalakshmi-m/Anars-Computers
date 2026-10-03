@@ -68,7 +68,7 @@ onAuthStateChanged(auth, async (user) => {
                 </button>
                 <div id="profileDropdownMenu" class="profile-dropdown-menu">
                     <button onclick="openAccountModal()">My Profile</button>
-                    ${isAdmin ? `<button onclick="window.location.href='admin.html'" style="color:#16a34a; font-weight:800;">Admin Dashboard</button>` : ''}
+                    ${isAdmin ? `<a href="admin.html" style="color:#16a34a; font-weight:800; display:block; padding:13px 18px; text-decoration:none;">⚙️ Admin Dashboard</a>` : ''}
                     <button onclick="handleLogout()" style="color:#dc2626;">Logout</button>
                 </div>
             `;
