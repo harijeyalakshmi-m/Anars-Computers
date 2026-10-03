@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Anars Computers | Kuthukalvalasai IT Store</title>
-    <meta name="description" content="Anars Computers in Kuthukalvalasai - Buy Laptops, Desktops, RAM, SSDs, and CCTV Cameras at the best price.">
+    <meta name="description" content="Anars Computers in Kuthukalvalasai - Buy Laptops, Desktops, RAM, SSDs, and CCTV Cameras at the best price with official warranty.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -90,10 +90,14 @@
                 </div>
             </section>
 
+            <!-- SEAMLESS BRAND LOGOS CAROUSEL -->
             <section id="brandsLogoSection" class="brand-logos-section reveal" style="display: none;">
-                <div class="container brand-track-wrapper" id="brandLogosTrack"></div>
+                <div class="container brand-track-wrapper">
+                    <div id="brandLogosTrack" class="brand-track"></div>
+                </div>
             </section>
 
+            <!-- SEARCH BAR -->
             <section class="search-section reveal">
                 <div class="container">
                     <div class="search-box">
@@ -110,6 +114,7 @@
                 </div>
             </section>
 
+            <!-- PRODUCTS SECTION -->
             <section id="products" class="products-section reveal">
                 <div class="container">
                     <div class="products-top">
@@ -163,7 +168,7 @@
             </section>
         </div>
 
-        <!-- OTHER PAGES -->
+        <!-- OTHER STORE PAGES -->
         <div id="detailPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">← Back to Store</button><div id="productDetailContainer"></div></div></div>
         <div id="cartPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">← Continue Shopping</button><div class="cart-page-header"><h2>Shopping Cart</h2></div><div id="cartPageContent"></div></div></div>
         <div id="wishlistPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">← Continue Shopping</button><div class="cart-page-header"><h2>My Saved Wishlist</h2></div><div id="wishlistPageContent"></div></div></div>
@@ -171,7 +176,7 @@
         <div id="successPage" class="page-view"><div class="container reveal" style="padding: 80px 0; text-align: center;"><div class="success-card"><div class="success-icon">✓</div><h2>Order Placed Successfully!</h2><p>Your Order ID is <span id="confirmedOrderId" style="font-weight:700; color:#2563eb;"></span></p><button class="primary-btn" onclick="showPage('home')" style="margin:20px auto 0;">Return to Store</button></div></div></div>
         <div id="ordersPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">← Back to Store</button><div class="cart-page-header"><h2>My Orders & Invoices</h2></div><div id="myOrdersListContainer"></div></div></div>
 
-        <!-- 🌟 MERGED ADMIN DASHBOARD VIEW INSIDE MAIN WEBSITE 🌟 -->
+        <!-- 🌟 MERGED ADMIN DASHBOARD VIEW 🌟 -->
         <div id="adminPage" class="page-view">
             <div class="container" style="padding: 40px 0;">
                 <button class="back-btn" onclick="showPage('home')">← Back to Storefront</button>
@@ -183,14 +188,13 @@
                     <div class="stat-card"><h4>Store Location</h4><div class="stat-value" style="font-size: 16px; font-weight: 700; color: #2563eb; margin-top: 6px;">Kuthukalvalasai</div></div>
                 </div>
 
-                <!-- Admin Tabs Control -->
                 <div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
                     <button id="btnTabOrders" class="primary-btn" style="padding: 10px 20px;" onclick="switchAdminTab('orders')">Live Orders</button>
                     <button id="btnTabProducts" class="primary-btn" style="background:#334155; padding: 10px 20px;" onclick="switchAdminTab('products')">Manage Products</button>
                     <button id="btnTabMeta" class="primary-btn" style="background:#334155; padding: 10px 20px;" onclick="switchAdminTab('meta')">Settings & Logos</button>
                 </div>
 
-                <!-- TAB 1: ORDERS -->
+                <!-- ADMIN TAB 1: ORDERS -->
                 <div id="adminTabOrders" class="admin-tab-section">
                     <div class="admin-card">
                         <h2><span>Live Customer Orders Control</span><span style="font-size: 12px; font-weight: 600; color: #64748b;" id="orderCountBadge">0 Orders</span></h2>
@@ -203,7 +207,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 2: PRODUCTS -->
+                <!-- ADMIN TAB 2: PRODUCTS -->
                 <div id="adminTabProducts" class="admin-tab-section" style="display:none;">
                     <div class="admin-card">
                         <h2 id="formHeading">Add New Product to Firebase Database</h2>
@@ -233,7 +237,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 3: SETTINGS & LOGOS -->
+                <!-- ADMIN TAB 3: SETTINGS & LOGOS -->
                 <div id="adminTabMeta" class="admin-tab-section" style="display:none;">
                     <div class="admin-card" style="border: 2px solid #2563eb;">
                         <h2>Live Site UI Layout Toggle</h2>
