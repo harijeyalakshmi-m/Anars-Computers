@@ -27,7 +27,7 @@ let currentBrand = "All";
 let currentSearch = "";
 let wishlist = [];
 let cart = [];
-let orders = [];
+let orders = []; 
 let productReviews = JSON.parse(localStorage.getItem("anarsProductReviews") || "{}");
 let currentSlide = 0;
 
@@ -68,7 +68,7 @@ onAuthStateChanged(auth, async (user) => {
                 </button>
                 <div id="profileDropdownMenu" class="profile-dropdown-menu">
                     <button onclick="openAccountModal()">My Profile</button>
-                    ${isAdmin ? `<button onclick="window.location.href='admin.html'" style="color:#16a34a; font-weight:800;">⚙️ Admin Dashboard</button>` : ''}
+                    ${isAdmin ? `<button onclick="window.location.href='admin.html'" style="color:#16a34a; font-weight:800;">Admin Dashboard</button>` : ''}
                     <button onclick="handleLogout()" style="color:#dc2626;">Logout</button>
                 </div>
             `;
@@ -128,12 +128,10 @@ window.handleEmailAuth = async function(event) {
             await setDoc(doc(db, "users", res.user.uid), { email, name: "", phone: "", cart: [], wishlist: [], orders: [] });
             alert("Account registered successfully!");
             closeAuthModal();
-            if (email === ADMIN_EMAIL) { window.location.href = "admin.html"; }
         } else {
             await signInWithEmailAndPassword(auth, email, password);
             alert("Logged in successfully!");
             closeAuthModal();
-            if (email === ADMIN_EMAIL) { window.location.href = "admin.html"; }
         }
     } catch (e) { console.error("Auth Error:", e); alert("Authentication failed: " + e.message); }
 };
@@ -341,7 +339,11 @@ function renderWishlistPage() {
             <div class="fk-cart-img-wrapper" style="border:none; padding:0; margin:0;"><img src="${product.image}" alt="${product.name}" class="fk-cart-item-img" onerror="imageFallback(this)" loading="lazy" width="120" height="120"></div>
             <div class="fk-cart-item-details">
                 <h4 onclick="openProductDetail('${product.id}')">${product.name}</h4><div class="seller">Seller: Anars Computers • ${product.brand}</div>
-                <div class="fk-cart-price-row"><span class="fk-cart-price">₹${Number(product.price).toLocaleString("en-IN")}</span><span class="fk-cart-mrp">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span><span class="fk-cart-discount">${discount}% Off</span></div>
+                <div class="fk-cart-price-row">
+                    <span class="fk-cart-price">₹${Number(product.price).toLocaleString("en-IN")}</span>
+                    <span class="fk-cart-mrp">₹${Number(product.originalPrice).toLocaleString("en-IN")}</span>
+                    <span class="fk-cart-discount">${discount}% Off</span>
+                </div>
                 <div class="fk-action-links">
                     <button onclick="removeWishlist('${product.id}')" class="fk-text-btn text-danger" style="color:#dc2626;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> REMOVE</button>
                     <button onclick="addToCart('${product.id}'); removeWishlist('${product.id}');" class="fk-text-btn" style="color:#2563eb;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg> MOVE TO CART</button>
