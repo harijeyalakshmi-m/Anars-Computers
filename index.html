@@ -1,24 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Anars Computers | Kuthukalvalasai IT Store</title>
-    <meta name="description" content="Anars Computers in Kuthukalvalasai - Buy Laptops, Desktops, RAM, SSDs, and CCTV Cameras at the best price with official warranty.">
-    
+    <meta name="description"
+        content="Anars Computers in Kuthukalvalasai - Buy Laptops, Desktops, RAM, SSDs, and CCTV Cameras at the best price.">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body data-theme="modern">
 
     <!-- MARQUEE ANNOUNCEMENT BAR -->
     <div class="marquee-bar">
         <div class="container">
             <marquee behavior="scroll" direction="left" scrollamount="5">
-                Welcome to Anars Computers, Annai Complex, Kuthukalvalasai! &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
-                Best deals on Laptops, Custom Gaming Rigs, RAM, SSD, and CCTV Cameras! &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+                Welcome to Anars Computers, Annai Complex, Kuthukalvalasai! &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
+                Best deals on Laptops, Custom Gaming Rigs, RAM, SSD, and CCTV Cameras! &nbsp;&nbsp;&nbsp; |
+                &nbsp;&nbsp;&nbsp;
                 Call Us: 091503 03600 for instant technical support!
             </marquee>
         </div>
@@ -29,7 +35,12 @@
         <div class="container header-inner">
             <div style="display:flex; align-items:center; gap:14px;">
                 <button class="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Open Mobile Menu">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
                 </button>
                 <a href="#home" class="logo" onclick="showPage('home')" aria-label="Anars Computers Home">
                     <span class="logo-main">ANARS</span>
@@ -49,9 +60,12 @@
             <div class="header-actions">
                 <div class="desktop-only-actions">
                     <button class="header-btn" onclick="focusSearch()" aria-label="Search">Search</button>
-                    <button class="header-btn" onclick="showPage('orders')">Orders <span id="ordersCount" class="badge">0</span></button>
-                    <button class="header-btn" onclick="showPage('wishlist')">Wishlist <span id="wishlistCount" class="badge">0</span></button>
-                    <button class="header-btn" onclick="showPage('cart')">Cart <span id="cartCount" class="badge">0</span></button>
+                    <button class="header-btn" onclick="showPage('orders')">Orders <span id="ordersCount"
+                            class="badge">0</span></button>
+                    <button class="header-btn" onclick="showPage('wishlist')">Wishlist <span id="wishlistCount"
+                            class="badge">0</span></button>
+                    <button class="header-btn" onclick="showPage('cart')">Cart <span id="cartCount"
+                            class="badge">0</span></button>
                 </div>
                 <div id="authButtonContainer" class="profile-dropdown-wrapper"></div>
             </div>
@@ -63,16 +77,19 @@
         <div id="homePage" class="page-view active">
             <section class="hero reveal-zoom">
                 <div class="hero-slider">
-                    <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=1800&q=80')">
+                    <div class="hero-slide active"
+                        style="background-image:url('https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=1800&q=80')">
                         <div class="hero-overlay"></div>
                         <div class="container hero-content">
                             <span class="hero-tag">KUTHUKALVALASAI'S PREMIER IT STORE</span>
                             <h1>Build Your<br>Ultimate Gaming Rig</h1>
-                            <p>High-performance Laptops, Custom Desktop PCs, Components, and Expert IT Solutions right at your doorstep.</p>
+                            <p>High-performance Laptops, Custom Desktop PCs, Components, and Expert IT Solutions right
+                                at your doorstep.</p>
                             <button class="primary-btn" onclick="scrollToProducts()">Explore Products</button>
                         </div>
                     </div>
-                    <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1800&q=80')">
+                    <div class="hero-slide"
+                        style="background-image:url('https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1800&q=80')">
                         <div class="hero-overlay"></div>
                         <div class="container hero-content">
                             <span class="hero-tag">LAPTOPS & WORKSTATIONS</span>
@@ -81,8 +98,10 @@
                             <button class="primary-btn" onclick="filterCategory('Laptops')">Shop Laptops</button>
                         </div>
                     </div>
-                    <button class="slider-btn slider-prev" onclick="changeSlide(-1)" aria-label="Previous Slide">&#10094;</button>
-                    <button class="slider-btn slider-next" onclick="changeSlide(1)" aria-label="Next Slide">&#10095;</button>
+                    <button class="slider-btn slider-prev" onclick="changeSlide(-1)"
+                        aria-label="Previous Slide">&#10094;</button>
+                    <button class="slider-btn slider-next" onclick="changeSlide(1)"
+                        aria-label="Next Slide">&#10095;</button>
                     <div class="slider-dots">
                         <button onclick="goToSlide(0)" class="dot active" aria-label="Slide 1"></button>
                         <button onclick="goToSlide(1)" class="dot" aria-label="Slide 2"></button>
@@ -92,14 +111,18 @@
 
             <!-- SEAMLESS BRAND LOGOS -->
             <section id="brandsLogoSection" class="brand-logos-section reveal" style="display: none;">
-                <div class="container brand-track-wrapper"><div id="brandLogosTrack" class="brand-track"></div></div>
+                <div class="container brand-track-wrapper">
+                    <div id="brandLogosTrack" class="brand-track"></div>
+                </div>
             </section>
 
             <!-- SEARCH BAR -->
             <section class="search-section reveal">
                 <div class="container">
                     <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Search laptops, computers, RAM, brands, CCTV..." oninput="searchProducts()" aria-label="Search Products">
+                        <input type="text" id="searchInput"
+                            placeholder="Search laptops, computers, RAM, brands, CCTV..." oninput="searchProducts()"
+                            aria-label="Search Products">
                         <button onclick="searchProducts()" aria-label="Search Button">Search</button>
                     </div>
                 </div>
@@ -107,7 +130,10 @@
 
             <section id="categories" class="categories-section reveal">
                 <div class="container">
-                    <div class="section-heading"><p>SHOP BY CATEGORY</p><h2>Everything Your Setup Needs</h2></div>
+                    <div class="section-heading">
+                        <p>SHOP BY CATEGORY</p>
+                        <h2>Everything Your Setup Needs</h2>
+                    </div>
                     <div id="categoryGridContainer" class="category-grid"></div>
                 </div>
             </section>
@@ -116,7 +142,10 @@
             <section id="products" class="products-section reveal">
                 <div class="container">
                     <div class="products-top">
-                        <div><p class="section-small">FEATURED CATALOG</p><h2 id="productHeading">All Products</h2></div>
+                        <div>
+                            <p class="section-small">FEATURED CATALOG</p>
+                            <h2 id="productHeading">All Products</h2>
+                        </div>
                         <button class="clear-filter" onclick="showAllProducts()">View All Products</button>
                     </div>
                     <div id="brandFilters" class="brand-filters"></div>
@@ -131,74 +160,195 @@
 
             <section class="store-info-banner reveal">
                 <div class="container store-banner-grid">
-                    <div class="store-banner-card"><span class="banner-tag">OFFICIAL STORE LOCATION</span><h3>Annai Complex, Kuthukalvalasai</h3><p>Tamil Nadu 627803</p></div>
-                    <div class="store-banner-card"><span class="banner-tag">CUSTOMER RATING</span><h3>5.0 Star Rating</h3><p>Trusted Computer Store & IT Solutions</p></div>
-                    <div class="store-banner-card"><span class="banner-tag">DIRECT HELP LINE</span><h3>091503 03600</h3><p>Open Today · Closes 9:30 PM</p></div>
+                    <div class="store-banner-card"><span class="banner-tag">OFFICIAL STORE LOCATION</span>
+                        <h3>Annai Complex, Kuthukalvalasai</h3>
+                        <p>Tamil Nadu 627803</p>
+                    </div>
+                    <div class="store-banner-card"><span class="banner-tag">CUSTOMER RATING</span>
+                        <h3>5.0 Star Rating</h3>
+                        <p>Trusted Computer Store & IT Solutions</p>
+                    </div>
+                    <div class="store-banner-card"><span class="banner-tag">DIRECT HELP LINE</span>
+                        <h3>091503 03600</h3>
+                        <p>Open Today · Closes 9:30 PM</p>
+                    </div>
                 </div>
             </section>
 
             <section id="about" class="about-section reveal">
                 <div class="container about-grid">
                     <div class="about-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=80" alt="Anars Store" width="500" height="420" loading="lazy">
-                        <div class="about-badge-floating"><strong>5.0 Star</strong><span>Top Rated Local Store</span></div>
+                        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=80"
+                            alt="Anars Store" width="500" height="420" loading="lazy">
+                        <div class="about-badge-floating"><strong>5.0 Star</strong><span>Top Rated Local Store</span>
+                        </div>
                     </div>
                     <div class="about-content">
                         <p class="section-small">ABOUT ANARS COMPUTERS</p>
                         <h2>Technology That Works For You</h2>
-                        <p class="about-lead">Located right at Annai Complex, Kuthukalvalasai, Tamil Nadu 627803, Anars Computers is your trusted local destination for computer hardware, laptops, and IT solutions.</p>
+                        <p class="about-lead">Located right at Annai Complex, Kuthukalvalasai, Tamil Nadu 627803, Anars
+                            Computers is your trusted local destination for computer hardware, laptops, and IT
+                            solutions.</p>
                     </div>
                 </div>
             </section>
 
             <section id="contact" class="contact-section reveal">
                 <div class="container">
-                    <div class="section-heading text-center"><p>GET IN TOUCH</p><h2>Visit Our Store in Kuthukalvalasai</h2></div>
+                    <div class="section-heading text-center">
+                        <p>GET IN TOUCH</p>
+                        <h2>Visit Our Store in Kuthukalvalasai</h2>
+                    </div>
                     <div class="contact-grid" style="margin-bottom: 30px;">
-                        <div class="contact-card"><h3>Visit Store</h3><p><strong>Anars Computers</strong></p><p>Annai Complex, Kuthukalvalasai, TN 627803</p></div>
-                        <div class="contact-card"><h3>Call Store</h3><p><strong>Phone:</strong> <a href="tel:09150303600" style="color:#2563eb; font-weight:600;">091503 03600</a></p></div>
-                        <div class="contact-card"><h3>Google Maps Navigation</h3><a href="https://www.google.com/maps/search/?api=1&query=Annai+Complex+Kuthukalvalasai+Tamil+Nadu+627803" target="_blank" rel="noopener noreferrer" class="primary-btn" style="margin-top: 10px; display:inline-block; font-size:12px; padding: 8px 16px;">Open in Google Maps →</a></div>
+                        <div class="contact-card">
+                            <h3>Visit Store</h3>
+                            <p><strong>Anars Computers</strong></p>
+                            <p>Annai Complex, Kuthukalvalasai, TN 627803</p>
+                        </div>
+                        <div class="contact-card">
+                            <h3>Call Store</h3>
+                            <p><strong>Phone:</strong> <a href="tel:09150303600"
+                                    style="color:#2563eb; font-weight:600;">091503 03600</a></p>
+                        </div>
+                        <div class="contact-card">
+                            <h3>Google Maps Navigation</h3><a
+                                href="https://www.google.com/maps/search/?api=1&query=Annai+Complex+Kuthukalvalasai+Tamil+Nadu+627803"
+                                target="_blank" rel="noopener noreferrer" class="primary-btn"
+                                style="margin-top: 10px; display:inline-block; font-size:12px; padding: 8px 16px;">Open
+                                in Google Maps →</a>
+                        </div>
                     </div>
                     <div style="border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; height: 350px;">
-                        <iframe title="Store Location Google Map" width="100%" height="100%" frameborder="0" scrolling="no" src="https://maps.google.com/maps?q=Kuthukalvalasai+Tamil+Nadu+627803&t=&z=14&ie=UTF8&iwloc=&output=embed" loading="lazy"></iframe>
+                        <iframe title="Store Location Google Map" width="100%" height="100%" frameborder="0"
+                            scrolling="no"
+                            src="https://maps.google.com/maps?q=Kuthukalvalasai+Tamil+Nadu+627803&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                            loading="lazy"></iframe>
                     </div>
                 </div>
             </section>
         </div>
 
         <!-- OTHER STORE PAGES -->
-        <div id="detailPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">← Back to Store</button><div id="productDetailContainer"></div></div></div>
-        <div id="cartPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">← Continue Shopping</button><div class="cart-page-header"><h2>Shopping Cart</h2></div><div id="cartPageContent"></div></div></div>
-        <div id="wishlistPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">← Continue Shopping</button><div class="cart-page-header"><h2>My Saved Wishlist</h2></div><div id="wishlistPageContent"></div></div></div>
-        <div id="checkoutPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('cart')">← Back to Cart</button><div class="cart-page-header"><h2>Shipping & Checkout Details</h2></div><div class="checkout-layout"><form class="checkout-form-box" onsubmit="submitOrder(event)"><h3>Shipping Address</h3><div class="form-group"><label>Full Name</label><input type="text" id="shipName" required></div><div class="form-group"><label>Phone Number</label><input type="tel" id="shipPhone" required></div><div class="form-group"><label>Street Address / Door No</label><input type="text" id="shipAddress" required></div><button type="submit" class="fk-place-order-btn" style="margin-top:20px;">COMPLETE ORDER</button></form><div class="fk-price-sidebar" id="checkoutSummarySidebar"></div></div></div></div>
-        <div id="successPage" class="page-view"><div class="container reveal" style="padding: 80px 0; text-align: center;"><div class="success-card"><div class="success-icon">✓</div><h2>Order Placed Successfully!</h2><p>Your Order ID is <span id="confirmedOrderId" style="font-weight:700; color:#2563eb;"></span></p><button class="primary-btn" onclick="showPage('home')" style="margin:20px auto 0;">Return to Store</button></div></div></div>
-        <div id="ordersPage" class="page-view"><div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">← Back to Store</button><div class="cart-page-header"><h2>My Orders & Invoices</h2></div><div id="myOrdersListContainer"></div></div></div>
+        <div id="detailPage" class="page-view">
+            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">←
+                    Back to Store</button>
+                <div id="productDetailContainer"></div>
+            </div>
+        </div>
+        <div id="cartPage" class="page-view">
+            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">←
+                    Continue Shopping</button>
+                <div class="cart-page-header">
+                    <h2>Shopping Cart</h2>
+                </div>
+                <div id="cartPageContent"></div>
+            </div>
+        </div>
+        <div id="wishlistPage" class="page-view">
+            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">←
+                    Continue Shopping</button>
+                <div class="cart-page-header">
+                    <h2>My Saved Wishlist</h2>
+                </div>
+                <div id="wishlistPageContent"></div>
+            </div>
+        </div>
+        <div id="checkoutPage" class="page-view">
+            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('cart')">←
+                    Back to Cart</button>
+                <div class="cart-page-header">
+                    <h2>Shipping & Checkout Details</h2>
+                </div>
+                <div class="checkout-layout">
+                    <form class="checkout-form-box" onsubmit="submitOrder(event)">
+                        <h3>Shipping Address</h3>
+                        <div class="form-group"><label>Full Name</label><input type="text" id="shipName" required></div>
+                        <div class="form-group"><label>Phone Number</label><input type="tel" id="shipPhone" required>
+                        </div>
+                        <div class="form-group"><label>Street Address / Door No</label><input type="text"
+                                id="shipAddress" required></div><button type="submit" class="fk-place-order-btn"
+                            style="margin-top:20px;">COMPLETE ORDER</button>
+                    </form>
+                    <div class="fk-price-sidebar" id="checkoutSummarySidebar"></div>
+                </div>
+            </div>
+        </div>
+        <div id="successPage" class="page-view">
+            <div class="container reveal" style="padding: 80px 0; text-align: center;">
+                <div class="success-card">
+                    <div class="success-icon">✓</div>
+                    <h2>Order Placed Successfully!</h2>
+                    <p>Your Order ID is <span id="confirmedOrderId" style="font-weight:700; color:#2563eb;"></span></p>
+                    <button class="primary-btn" onclick="showPage('home')" style="margin:20px auto 0;">Return to
+                        Store</button>
+                </div>
+            </div>
+        </div>
+        <div id="ordersPage" class="page-view">
+            <div class="container reveal" style="padding: 40px 0;"><button class="back-btn" onclick="showPage('home')">←
+                    Back to Store</button>
+                <div class="cart-page-header">
+                    <h2>My Orders & Invoices</h2>
+                </div>
+                <div id="myOrdersListContainer"></div>
+            </div>
+        </div>
 
-        <!-- 🌟 MERGED ADMIN DASHBOARD VIEW 🌟 -->
+        <!-- 🌟 MERGED ADMIN DASHBOARD VIEW (FULLY RESPONSIVE) 🌟 -->
         <div id="adminPage" class="page-view">
             <div class="container" style="padding: 40px 0;">
                 <button class="back-btn" onclick="showPage('home')">← Back to Storefront</button>
-                <div class="cart-page-header"><h2>Store Management Dashboard</h2></div>
-                
-                <div class="stats-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; margin-top: 20px; margin-bottom: 30px;">
-                    <div class="stat-card" style="background:white; padding:24px; border-radius:12px; border:1px solid #e2e8f0;"><h4>Active Orders</h4><div class="stat-value" id="statActiveOrders" style="font-size:28px; font-weight:800;">0</div></div>
-                    <div class="stat-card" style="background:white; padding:24px; border-radius:12px; border:1px solid #e2e8f0;"><h4>Total Store Products</h4><div class="stat-value" id="statTotalProducts" style="font-size:28px; font-weight:800;">0</div></div>
-                    <div class="stat-card" style="background:white; padding:24px; border-radius:12px; border:1px solid #e2e8f0;"><h4>Store Location</h4><div class="stat-value" style="font-size: 16px; font-weight: 700; color: #2563eb; margin-top: 6px;">Kuthukalvalasai</div></div>
+                <div class="cart-page-header">
+                    <h2>Store Management Dashboard</h2>
                 </div>
 
-                <div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
-                    <button id="btnTabOrders" class="primary-btn" style="padding: 10px 20px;" onclick="switchAdminTab('orders')">Live Orders</button>
-                    <button id="btnTabProducts" class="primary-btn" style="background:#334155; padding: 10px 20px;" onclick="switchAdminTab('products')">Manage Products</button>
-                    <button id="btnTabMeta" class="primary-btn" style="background:#334155; padding: 10px 20px;" onclick="switchAdminTab('meta')">Settings & Logos</button>
+                <div class="stats-grid"
+                    style="display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; margin-top: 20px; margin-bottom: 30px;">
+                    <div class="stat-card"
+                        style="background:white; padding:24px; border-radius:12px; border:1px solid #e2e8f0;">
+                        <h4>Active Orders</h4>
+                        <div class="stat-value" id="statActiveOrders" style="font-size:28px; font-weight:800;">0</div>
+                    </div>
+                    <div class="stat-card"
+                        style="background:white; padding:24px; border-radius:12px; border:1px solid #e2e8f0;">
+                        <h4>Total Store Products</h4>
+                        <div class="stat-value" id="statTotalProducts" style="font-size:28px; font-weight:800;">0</div>
+                    </div>
+                    <div class="stat-card"
+                        style="background:white; padding:24px; border-radius:12px; border:1px solid #e2e8f0;">
+                        <h4>Store Location</h4>
+                        <div class="stat-value"
+                            style="font-size: 16px; font-weight: 700; color: #2563eb; margin-top: 6px;">Kuthukalvalasai
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-tab-buttons" style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
+                    <button id="btnTabOrders" class="primary-btn" style="padding: 10px 20px;"
+                        onclick="switchAdminTab('orders')">Live Orders</button>
+                    <button id="btnTabProducts" class="primary-btn" style="background:#334155; padding: 10px 20px;"
+                        onclick="switchAdminTab('products')">Manage Products</button>
+                    <button id="btnTabMeta" class="primary-btn" style="background:#334155; padding: 10px 20px;"
+                        onclick="switchAdminTab('meta')">Settings & Logos</button>
                 </div>
 
                 <!-- ADMIN TAB 1: ORDERS -->
                 <div id="adminTabOrders" class="admin-tab-section">
                     <div class="admin-card">
-                        <h2><span>Live Customer Orders Control</span><span style="font-size: 12px; font-weight: 600; color: #64748b;" id="orderCountBadge">0 Orders</span></h2>
+                        <h2><span>Live Customer Orders Control</span><span
+                                style="font-size: 12px; font-weight: 600; color: #64748b;" id="orderCountBadge">0
+                                Orders</span></h2>
                         <div style="overflow-x: auto;">
                             <table class="admin-table">
-                                <thead><tr><th>Order ID & Date</th><th>Customer Info</th><th>Shipping Address</th><th>Items Ordered</th><th>Live Status Control</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>Order ID & Date</th>
+                                        <th>Customer Info</th>
+                                        <th>Shipping Address</th>
+                                        <th>Items Ordered</th>
+                                        <th>Live Status Control</th>
+                                    </tr>
+                                </thead>
                                 <tbody id="adminOrdersTableBody"></tbody>
                             </table>
                         </div>
@@ -211,27 +361,50 @@
                         <h2 id="formHeading">Add New Product to Firebase Database</h2>
                         <form id="productForm">
                             <input type="hidden" id="editProductId">
-                            <div class="admin-form-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                                <div class="form-group"><label>Product Name</label><input type="text" id="admName" placeholder="e.g. ASUS TUF Gaming" required></div>
-                                <div class="form-group"><label>Brand</label><select id="admBrandSelect" required><option value="">Select Brand</option></select></div>
-                                <div class="form-group"><label>Category</label><select id="admCategorySelect" required><option value="">Select Category</option></select></div>
-                                <div class="form-group"><label>Selling Price (₹)</label><input type="number" id="admPrice" placeholder="64999" required></div>
-                                <div class="form-group"><label>Original MRP (₹)</label><input type="number" id="admOrigPrice" placeholder="84999" required></div>
-                                <div class="form-group"><label>Image URL</label><input type="text" id="admImage" placeholder="https://..." required></div>
-                                <div class="form-group" style="grid-column:span 2;"><label>Description & Specifications</label><input type="text" id="admDesc" placeholder="Detailed highlights" required></div>
+                            <div class="admin-form-grid"
+                                style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                                <div class="form-group"><label>Product Name</label><input type="text" id="admName"
+                                        placeholder="e.g. ASUS TUF Gaming" required></div>
+                                <div class="form-group"><label>Brand</label><select id="admBrandSelect" required>
+                                        <option value="">Select Brand</option>
+                                    </select></div>
+                                <div class="form-group"><label>Category</label><select id="admCategorySelect" required>
+                                        <option value="">Select Category</option>
+                                    </select></div>
+                                <div class="form-group"><label>Selling Price (₹)</label><input type="number"
+                                        id="admPrice" placeholder="64999" required></div>
+                                <div class="form-group"><label>Original MRP (₹)</label><input type="number"
+                                        id="admOrigPrice" placeholder="84999" required></div>
+                                <div class="form-group"><label>Image URL</label><input type="text" id="admImage"
+                                        placeholder="https://..." required></div>
+                                <div class="form-group" style="grid-column:span 2;"><label>Description &
+                                        Specifications</label><input type="text" id="admDesc"
+                                        placeholder="Detailed highlights" required></div>
                             </div>
                             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                                <button type="submit" class="primary-btn" id="submitProductBtn">Upload to Live Store</button>
-                                <button type="button" id="cancelEditBtn" class="primary-btn" style="background:#64748b; display:none;" onclick="resetProductForm()">Cancel Edit</button>
+                                <button type="submit" class="primary-btn" id="submitProductBtn">Upload to Live
+                                    Store</button>
+                                <button type="button" id="cancelEditBtn" class="primary-btn"
+                                    style="background:#64748b; display:none;" onclick="resetProductForm()">Cancel
+                                    Edit</button>
                             </div>
                         </form>
                     </div>
                     <div class="admin-card">
                         <h2>Existing Products Inventory</h2>
-                        <table class="admin-table">
-                            <thead><tr><th>Product Name</th><th>Brand / Category</th><th>Price</th><th>Actions</th></tr></thead>
-                            <tbody id="adminProductsTableBody"></tbody>
-                        </table>
+                        <div style="overflow-x: auto;">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Brand / Category</th>
+                                        <th>Price</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminProductsTableBody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -239,25 +412,50 @@
                 <div id="adminTabMeta" class="admin-tab-section" style="display:none;">
                     <div class="admin-card" style="border: 2px solid #2563eb;">
                         <h2>Live Site UI Layout Toggle</h2>
-                        <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Switch between horizontal lists (Flipkart style) or standard cards (Classic style).</p>
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Switch between horizontal lists
+                            (Flipkart style) or standard cards (Classic style).</p>
                         <div style="display: flex; gap: 20px;">
-                            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px;"><input type="radio" name="uiThemeToggle" value="modern" onchange="updateUITheme(this.value)"> Modern E-commerce List (Flipkart Style)</label>
-                            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px;"><input type="radio" name="uiThemeToggle" value="classic" onchange="updateUITheme(this.value)"> Classic Grid (Box Style)</label>
+                            <label
+                                style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px;"><input
+                                    type="radio" name="uiThemeToggle" value="modern"
+                                    onchange="updateUITheme(this.value)"> Modern E-commerce List (Flipkart
+                                Style)</label>
+                            <label
+                                style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px;"><input
+                                    type="radio" name="uiThemeToggle" value="classic"
+                                    onchange="updateUITheme(this.value)"> Classic Grid (Box Style)</label>
                         </div>
                     </div>
                     <div class="admin-card">
                         <h2>Store Frontend Brand Logos Carousel</h2>
-                        <div style="margin-bottom: 20px;"><label style="display:flex; align-items:center; gap:10px; font-weight:700; font-size:14px; cursor:pointer;"><input type="checkbox" id="admMarqueeToggle" onchange="toggleMarquee()"> Enable Marquee Animation (Auto-Scroll)</label></div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px; align-items:end;">
-                            <div class="form-group" style="margin-bottom:0;"><label>Brand Name</label><input type="text" id="logoName" placeholder="Asus"></div>
-                            <div class="form-group" style="margin-bottom:0;"><label>Logo URL</label><input type="text" id="logoUrl" placeholder="https://..."></div>
-                            <div class="form-group" style="margin-bottom:0;"><label>Position</label><input type="number" id="logoPos" value="1"></div>
-                            <button class="primary-btn" style="padding:12px;" onclick="addBrandLogo()">+ Add Logo</button>
+                        <div style="margin-bottom: 20px;"><label
+                                style="display:flex; align-items:center; gap:10px; font-weight:700; font-size:14px; cursor:pointer;"><input
+                                    type="checkbox" id="admMarqueeToggle" onchange="toggleMarquee()"> Enable Marquee
+                                Animation (Auto-Scroll)</label></div>
+                        <div class="admin-logo-grid"
+                            style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px; align-items:end;">
+                            <div class="form-group" style="margin-bottom:0;"><label>Brand Name</label><input type="text"
+                                    id="logoName" placeholder="Asus"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label>Logo URL</label><input type="text"
+                                    id="logoUrl" placeholder="https://..."></div>
+                            <div class="form-group" style="margin-bottom:0;"><label>Position</label><input type="number"
+                                    id="logoPos" value="1"></div>
+                            <button class="primary-btn" style="padding:12px;" onclick="addBrandLogo()">+ Add
+                                Logo</button>
                         </div>
-                        <table class="admin-table" style="margin-top: 20px;">
-                            <thead><tr><th>Pos</th><th>Image</th><th>Name</th><th>Action</th></tr></thead>
-                            <tbody id="adminBrandLogosTable"></tbody>
-                        </table>
+                        <div style="overflow-x: auto;">
+                            <table class="admin-table" style="margin-top: 20px;">
+                                <thead>
+                                    <tr>
+                                        <th>Pos</th>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminBrandLogosTable"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -270,25 +468,37 @@
         <div class="fs-auth-container">
             <div class="fs-auth-left">
                 <div style="position: relative; z-index: 2;">
-                    <span style="font-size: 14px; font-weight: 800; letter-spacing: 3px; color: #38bdf8; text-transform: uppercase;">Anars Computers</span>
-                    <h1 style="font-size: 48px; font-weight: 800; line-height: 1.1; margin: 20px 0;">Your Ultimate<br>Tech Destination.</h1>
+                    <span
+                        style="font-size: 14px; font-weight: 800; letter-spacing: 3px; color: #38bdf8; text-transform: uppercase;">Anars
+                        Computers</span>
+                    <h1 style="font-size: 48px; font-weight: 800; line-height: 1.1; margin: 20px 0;">Your
+                        Ultimate<br>Tech Destination.</h1>
                 </div>
             </div>
             <div class="fs-auth-right">
                 <button onclick="closeAuthModal()" class="fs-close-btn" aria-label="Close Modal">✕</button>
                 <div class="fs-form-box">
-                    <h3 id="authModalTitle" style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Customer Login</h3>
-                    <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;" id="authSubtitle">Please enter your details to continue.</p>
-                    
+                    <h3 id="authModalTitle"
+                        style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Customer Login
+                    </h3>
+                    <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;" id="authSubtitle">Please enter your
+                        details to continue.</p>
+
                     <form id="authForm" onsubmit="handleEmailAuth(event)" class="fs-auth-form">
-                        <div class="fs-input-group"><label>Email Address</label><input type="email" id="authEmail" placeholder="name@example.com" required></div>
-                        <div class="fs-input-group" id="passwordInputGroup"><label>Password</label><input type="password" id="authPassword" placeholder="Min 6 characters"></div>
-                        <button type="submit" id="authSubmitBtn" class="primary-btn" style="width:100%; padding:16px; font-size:16px; margin-top:10px;">Login to Store</button>
+                        <div class="fs-input-group"><label>Email Address</label><input type="email" id="authEmail"
+                                placeholder="name@example.com" required></div>
+                        <div class="fs-input-group" id="passwordInputGroup"><label>Password</label><input
+                                type="password" id="authPassword" placeholder="Min 6 characters"></div>
+                        <button type="submit" id="authSubmitBtn" class="primary-btn"
+                            style="width:100%; padding:16px; font-size:16px; margin-top:10px;">Login to Store</button>
                     </form>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 13px;">
-                        <a href="javascript:void(0)" id="forgotPasswordLink" onclick="toggleForgotPasswordMode()" style="color: #64748b; font-weight: 600;">Forgot Password?</a>
-                        <a href="javascript:void(0)" onclick="toggleAuthMode()" id="authSwitchLink" style="color: #2563eb; font-weight: 800;">Register here</a>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 13px;">
+                        <a href="javascript:void(0)" id="forgotPasswordLink" onclick="toggleForgotPasswordMode()"
+                            style="color: #64748b; font-weight: 600;">Forgot Password?</a>
+                        <a href="javascript:void(0)" onclick="toggleAuthMode()" id="authSwitchLink"
+                            style="color: #2563eb; font-weight: 800;">Register here</a>
                     </div>
                 </div>
             </div>
@@ -298,15 +508,20 @@
     <!-- FULL-SCREEN PROFILE DASHBOARD -->
     <div id="accountModal" class="fs-overlay">
         <div class="fs-profile-container">
-            <button onclick="closeAccountModal()" class="fs-close-btn" style="position: fixed;" aria-label="Close Profile">✕</button>
+            <button onclick="closeAccountModal()" class="fs-close-btn" style="position: fixed;"
+                aria-label="Close Profile">✕</button>
             <div class="fs-profile-inner">
                 <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 30px;">
                     <h2 style="font-size: 32px; font-weight: 800; color: #0f172a;">My Profile Dashboard</h2>
                 </div>
                 <div id="accountModalContent" class="fs-profile-grid"></div>
-                <div style="display:flex; gap:16px; margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 30px;">
-                    <button class="primary-btn" onclick="saveUserProfile()" style="flex:1; background:#16a34a; padding: 16px; font-size: 15px;">Save Profile Changes</button>
-                    <button class="primary-btn" onclick="closeAccountModal()" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding: 16px 30px; font-size: 15px;">Cancel</button>
+                <div
+                    style="display:flex; gap:16px; margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 30px;">
+                    <button class="primary-btn" onclick="saveUserProfile()"
+                        style="flex:1; background:#16a34a; padding: 16px; font-size: 15px;">Save Profile
+                        Changes</button>
+                    <button class="primary-btn" onclick="closeAccountModal()"
+                        style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding: 16px 30px; font-size: 15px;">Cancel</button>
                 </div>
             </div>
         </div>
@@ -315,42 +530,144 @@
     <!-- HAMBURGER SIDEBAR -->
     <div id="mobileMenuOverlay" class="mobile-menu-overlay" onclick="toggleMobileMenu()"></div>
     <div id="mobileMenuSidebar" class="mobile-menu-sidebar">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 24px; border-bottom: 1px solid #e2e8f0;">
-            <div class="logo"><span class="logo-main" style="font-size: 20px;">ANARS</span><span class="logo-sub" style="font-size: 9px;">COMPUTERS</span></div>
-            <button onclick="toggleMobileMenu()" aria-label="Close Menu" style="background: #f1f5f9; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 14px; font-weight: bold; color: #475569;">✕</button>
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; padding: 24px; border-bottom: 1px solid #e2e8f0;">
+            <div class="logo"><span class="logo-main" style="font-size: 20px;">ANARS</span><span class="logo-sub"
+                    style="font-size: 9px;">COMPUTERS</span></div>
+            <button onclick="toggleMobileMenu()" aria-label="Close Menu"
+                style="background: #f1f5f9; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 14px; font-weight: bold; color: #475569;">✕</button>
         </div>
         <div class="mobile-menu-links">
-            <div class="mobile-sidebar-search"><input type="text" id="mobileSearchInputSidebar" placeholder="Search store..." oninput="searchProductsMobile()" aria-label="Mobile Search"></div>
-            <a href="#home" onclick="showPage('home'); toggleMobileMenu();">🏠 <span>Home</span></a>
-            <a href="#products" onclick="scrollToProducts(); toggleMobileMenu();">💻 <span>Store Products</span></a>
-            <a href="#categories" onclick="scrollToCategories(); toggleMobileMenu();">📁 <span>Top Categories</span></a>
+            <div class="mobile-sidebar-search"><input type="text" id="mobileSearchInputSidebar"
+                    placeholder="Search store..." oninput="searchProductsMobile()" aria-label="Mobile Search"></div>
+            <a href="#home" onclick="showPage('home'); toggleMobileMenu();">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg> <span>Home</span>
+            </a>
+            <a href="#products" onclick="scrollToProducts(); toggleMobileMenu();">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg> <span>Store Products</span>
+            </a>
+            <a href="#categories" onclick="scrollToCategories(); toggleMobileMenu();">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg> <span>Top Categories</span>
+            </a>
             <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 10px 0;">
-            <a href="#orders" onclick="showPage('orders'); toggleMobileMenu();" class="sidebar-badge-link">📦 <span>My Orders</span><span class="sidebar-badge" id="sidebarOrdersCount">0</span></a>
-            <a href="#wishlist" onclick="showPage('wishlist'); toggleMobileMenu();" class="sidebar-badge-link">❤️ <span>Wishlist</span><span class="sidebar-badge" id="sidebarWishlistCount">0</span></a>
-            <a href="#cart" onclick="showPage('cart'); toggleMobileMenu();" class="sidebar-badge-link">🛒 <span>My Cart</span><span class="sidebar-badge" id="sidebarCartCount">0</span></a>
+            <a href="#orders" onclick="showPage('orders'); toggleMobileMenu();" class="sidebar-badge-link">
+                <div style="display:flex; align-items:center; gap:10px;"><svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                        </path>
+                    </svg> <span>My Orders</span></div>
+                <span class="sidebar-badge" id="sidebarOrdersCount">0</span>
+            </a>
+            <a href="#wishlist" onclick="showPage('wishlist'); toggleMobileMenu();" class="sidebar-badge-link">
+                <div style="display:flex; align-items:center; gap:10px;"><svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z">
+                        </path>
+                    </svg> <span>Wishlist</span></div>
+                <span class="sidebar-badge" id="sidebarWishlistCount">0</span>
+            </a>
+            <a href="#cart" onclick="showPage('cart'); toggleMobileMenu();" class="sidebar-badge-link">
+                <div style="display:flex; align-items:center; gap:10px;"><svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg> <span>My Cart</span></div>
+                <span class="sidebar-badge" id="sidebarCartCount">0</span>
+            </a>
             <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 10px 0;">
-            <a href="#about" onclick="scrollToAbout(); toggleMobileMenu();">🏢 <span>About Store</span></a>
-            <a href="#contact" onclick="scrollToContact(); toggleMobileMenu();">📞 <span>Contact & Map</span></a>
+            <a href="#about" onclick="scrollToAbout(); toggleMobileMenu();"><svg width="18" height="18"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 16v-4"></path>
+                    <path d="M12 8h.01"></path>
+                </svg> <span>About Store</span></a>
+            <a href="#contact" onclick="scrollToContact(); toggleMobileMenu();"><svg width="18" height="18"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                    </path>
+                </svg> <span>Contact & Map</span></a>
         </div>
     </div>
 
-    <!-- MOBILE BOTTOM NAVIGATION -->
+    <!-- MOBILE BOTTOM NAVIGATION (SVG ICONS INSTEAD OF EMOJIS) -->
     <div class="mobile-bottom-nav">
-        <a href="#home" onclick="showPage('home')"><span>Home</span></a>
-        <a href="#products" onclick="scrollToProducts()"><span>Products</span></a>
-        <a href="#orders" onclick="showPage('orders')"><span>Orders</span></a>
-        <a href="#cart" onclick="showPage('cart')"><span>Cart</span></a>
+        <a href="#home" onclick="showPage('home')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+            <span>Home</span>
+        </a>
+        <a href="#products" onclick="scrollToProducts()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            <span>Products</span>
+        </a>
+        <a href="#orders" onclick="showPage('orders')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                </path>
+            </svg>
+            <span>Orders</span>
+        </a>
+        <a href="#cart" onclick="showPage('cart')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <span>Cart</span>
+        </a>
     </div>
 
     <footer class="footer reveal">
         <div class="container footer-grid">
-            <div><div class="footer-logo">ANARS COMPUTERS</div><p>Annai Complex, Kuthukalvalasai, TN 627803</p></div>
-            <div><h4>Categories</h4><a href="#products" onclick="showPage('home'); filterCategory('Laptops')">Laptops</a><a href="#products" onclick="showPage('home'); filterCategory('CCTV')">CCTV</a></div>
-            <div><h4>Support</h4><a href="#orders" onclick="showPage('orders')">My Orders</a><a href="#contact" onclick="scrollToContact()">Store Location</a></div>
+            <div>
+                <div class="footer-logo">ANARS COMPUTERS</div>
+                <p>Annai Complex, Kuthukalvalasai, TN 627803</p>
+            </div>
+            <div>
+                <h4>Categories</h4><a href="#products"
+                    onclick="showPage('home'); filterCategory('Laptops')">Laptops</a><a href="#products"
+                    onclick="showPage('home'); filterCategory('CCTV')">CCTV</a>
+            </div>
+            <div>
+                <h4>Support</h4><a href="#orders" onclick="showPage('orders')">My Orders</a><a href="#contact"
+                    onclick="scrollToContact()">Store Location</a>
+            </div>
         </div>
-        <div class="footer-bottom"><p>© 2026 Anars Computers, Kuthukalvalasai. All Rights Reserved.</p></div>
+        <div class="footer-bottom">
+            <p>© 2026 Anars Computers, Kuthukalvalasai. All Rights Reserved.</p>
+        </div>
     </footer>
 
     <script type="module" src="script.js"></script>
 </body>
+
 </html>
